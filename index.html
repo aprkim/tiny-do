@@ -784,7 +784,7 @@
 
     <div class="container">
         <div class="header">
-            <div class="main-title">Today's Checklist</div>
+            <div class="main-title">Tiny Wins Daily</div>
             <div class="date" id="currentDate"></div>
             <div class="progress-section">
                 <div class="progress-label" id="progressLabel">Progress: 0 / 0 tasks completed</div>
@@ -1128,14 +1128,11 @@
             updateProgress();
             renderTasks();
             
-            // Scroll the newly added task into view
+            // Scroll the task list to the bottom to show newly added task
             setTimeout(() => {
-                const taskElements = document.querySelectorAll('.task');
-                if (taskElements.length > 0) {
-                    const lastTask = taskElements[taskElements.length - 1];
-                    lastTask.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }
-            }, 0);
+                const taskList = document.getElementById('taskList');
+                taskList.scrollTop = taskList.scrollHeight;
+            }, 50);
         }
 
         // Complete task
