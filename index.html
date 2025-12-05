@@ -684,6 +684,7 @@
             updateProgress();
             renderTasks();
             renderHistory();
+            setupEventListeners();
         }
 
         // Check if setup is needed
@@ -861,8 +862,10 @@
             const taskList = document.getElementById('taskList');
             const activeTasks = currentData.tasks.filter(t => !t.completed);
             
+            console.log('Rendering tasks:', activeTasks.length, 'active tasks');
+            
             if (activeTasks.length === 0) {
-                taskList.innerHTML = '<div class="empty-message">No tasks yet. Add one above!</div>';
+                taskList.innerHTML = '<div class="empty-message">No tasks yet. Add one below!</div>';
                 return;
             }
             
