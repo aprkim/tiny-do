@@ -119,7 +119,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 12px;
         }
 
         .template-card-icon {
@@ -150,18 +149,6 @@
         .template-card-description {
             font-size: 13px;
             color: #64748B;
-        }
-
-        .template-card-tasks {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .template-card-task {
-            font-size: 14px;
-            color: #64748B;
-            padding: 2px 0;
         }
 
         .template-card.blank-card {
@@ -1255,10 +1242,6 @@
                                 <div class="template-card-title">${template.name}</div>
                                 <div class="template-card-description">${template.description}</div>
                             </div>
-                        </div>
-                        <div class="template-card-tasks">
-                            ${template.tasks.slice(0, 3).map(t => `<div class="template-card-task">${t}</div>`).join('')}
-                            ${template.tasks.length > 3 ? `<div class="template-card-task" style="color: #94A3B8;">+${template.tasks.length - 3} more...</div>` : ''}
                         </div>
                     </div>
                 `;
