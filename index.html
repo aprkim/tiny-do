@@ -238,47 +238,6 @@
             color: #666;
         }
 
-        .edit-mode-toggle {
-            width: 100%;
-            padding: 12px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            color: #666;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: background 0.3s, border-color 0.3s, color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-
-        .edit-mode-toggle:hover {
-            background: #f9f9f9;
-            border-color: #BF3143;
-            color: #BF3143;
-        }
-
-        .edit-mode-toggle.active {
-            background: #333;
-            color: white;
-            border-color: #333;
-        }
-
-        .edit-mode-toggle:disabled {
-            background: #e8e8e8;
-            color: #999;
-            border-color: #d0d0d0;
-            cursor: not-allowed;
-            opacity: 0.75;
-        }
-
-        .edit-mode-toggle:disabled:hover {
-            background: #e8e8e8;
-        }
 
         .progress-section {
             background: #f9f9f9;
@@ -296,7 +255,7 @@
         .progress-bar-container {
             width: 100%;
             height: 30px;
-            background: #e8e8e8;
+            background: #E6E3E2;
             border-radius: 15px;
             overflow: hidden;
             position: relative;
@@ -351,8 +310,8 @@
             fill: none;
         }
 
-        .clear-tasks-button {
-            padding: 6px 16px;
+        .edit-mode-button {
+            padding: 6px 12px;
             background: none;
             color: #666;
             border: none;
@@ -361,11 +320,37 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .clear-tasks-button:hover {
+        .edit-mode-button:hover {
             background: rgba(191, 49, 67, 0.1);
             color: #BF3143;
+        }
+
+        .edit-mode-button.active {
+            background: #333;
+            color: white;
+        }
+
+        .edit-mode-button:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .edit-mode-button:disabled:hover {
+            background: none;
+            color: #ccc;
+        }
+
+        .edit-mode-icon {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
         }
 
         .task-list {
@@ -374,21 +359,9 @@
             margin-bottom: 20px;
         }
 
-        #taskInput {
-            flex: 1;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
 
-        #taskInput:focus {
-            outline: none;
-            border-color: #BF3143;
-        }
-
-        #addButton {
+        #addTemplateButton,
+        #addTemporaryButton {
             padding: 12px 25px;
             background: #e8e8e8;
             color: #888;
@@ -400,37 +373,101 @@
             transition: transform 0.2s, opacity 0.3s, background 0.3s, color 0.3s;
         }
 
-        #addButton:not(:disabled) {
+        #addTemplateButton:not(:disabled),
+        #addTemporaryButton:not(:disabled) {
             background: #BF3143;
             color: white;
             cursor: pointer;
         }
 
-        #addButton:hover:not(:disabled) {
+        #addTemplateButton:hover:not(:disabled),
+        #addTemporaryButton:hover:not(:disabled) {
             transform: translateY(-2px);
             background: #a02838;
         }
 
-        #addButton:active:not(:disabled) {
+        #addTemplateButton:active:not(:disabled),
+        #addTemporaryButton:active:not(:disabled) {
             transform: translateY(0);
         }
 
-        #addButton:disabled {
+        #addTemplateButton:disabled,
+        #addTemporaryButton:disabled {
             background: #e8e8e8;
             color: #999;
             cursor: not-allowed;
         }
 
-        .task-list {
-            max-height: 500px;
-            overflow-y: auto;
+        .add-task-section {
+            border-top: 2px solid #E9E9EA;
+            padding-top: 20px;
             margin-bottom: 20px;
+        }
+
+        .input-section-wrapper {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fafafa;
+        }
+
+        .input-section-wrapper.template-input {
+            border-color: #E3E0DC;
+            background: #FAFAF9;
+        }
+
+        .input-section-wrapper.temporary-input {
+            border-color: #DADDE1;
+            background: #F6F7F8;
+        }
+
+        .input-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .label-icon {
+            width: 18px;
+            height: 18px;
+            stroke: #666;
+            stroke-width: 2;
+            fill: none;
         }
 
         .input-section {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+        }
+
+        #templateInput,
+        #temporaryInput {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background: white;
+        }
+
+        #templateInput {
+            border-color: #E3E0DC;
+        }
+
+        #temporaryInput {
+            border-color: #DADDE1;
+        }
+
+        #templateInput:focus,
+        #temporaryInput:focus {
+            outline: none;
+            border-color: #BF3143;
         }
 
         .change-template-button {
@@ -484,6 +521,16 @@
             margin-bottom: 10px;
             background: white;
             transition: all 0.3s ease;
+        }
+
+        .task-item.template-task {
+            border-color: #E3E0DC;
+            background: #FAFAF9;
+        }
+
+        .task-item.temporary-task {
+            border-color: #DADDE1;
+            background: #F6F7F8;
         }
 
         .task-item.dragging {
@@ -581,15 +628,19 @@
         }
 
         /* Dim Reset Today button when user is typing or in edit mode */
-        #taskInput:focus ~ .reset-button,
-        body:has(#taskInput:focus) .reset-button,
+        body:has(#templateInput:focus) .reset-button,
+        body:has(#temporaryInput:focus) .reset-button,
         body:has(.edit-mode) .reset-button {
             opacity: 0.3;
             pointer-events: none;
         }
 
+        .edit-mode-button.active .edit-mode-icon {
+            stroke: white;
+        }
+
         .history-section {
-            border-top: 2px solid #f0f0f0;
+            border-top: 2px solid #E9E9EA;
             padding-top: 20px;
         }
 
@@ -746,12 +797,9 @@
                 padding: 15px;
             }
 
-            .input-section {
-                flex-direction: column;
-            }
-
-            #addButton {
-                width: 100%;
+            #addTemplateButton,
+            #addTemporaryButton {
+                padding: 12px 20px;
             }
 
             .modal {
@@ -847,18 +895,51 @@
                     </svg>
                     Tasks
                 </div>
-                <button class="clear-tasks-button" onclick="clearAllTasks()">Clear All</button>
+                <button class="edit-mode-button" id="editModeToggle" onclick="toggleEditMode()">
+                    <svg class="edit-mode-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    <span>Edit Mode</span>
+                </button>
             </div>
             <div class="task-list" id="taskList"></div>
 
-            <div class="input-section">
-                <input 
-                    type="text" 
-                    id="taskInput" 
-                    placeholder="Enter a new task..." 
-                    maxlength="200"
-                >
-                <button id="addButton">Add</button>
+            <div class="add-task-section">
+            <div class="input-section-wrapper template-input">
+                <div class="input-label">
+                    <svg class="label-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Daily Template
+                </div>
+                <div class="input-section">
+                    <input 
+                        type="text" 
+                        id="templateInput" 
+                        placeholder="Add to daily checklist..." 
+                        maxlength="200"
+                    >
+                    <button id="addTemplateButton">Add</button>
+                </div>
+            </div>
+
+            <div class="input-section-wrapper temporary-input">
+                <div class="input-label">
+                    <svg class="label-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 4v16m8-8H4"/>
+                    </svg>
+                    One-Time Task
+                </div>
+                <div class="input-section">
+                    <input 
+                        type="text" 
+                        id="temporaryInput" 
+                        placeholder="Add one-time task..." 
+                        maxlength="200"
+                    >
+                    <button id="addTemporaryButton">Add</button>
+                </div>
+            </div>
             </div>
 
             <button class="reset-button" id="resetButton">
@@ -868,12 +949,6 @@
                 <span>Reset Today</span>
             </button>
 
-            <button class="edit-mode-toggle" id="editModeToggle" onclick="toggleEditMode()">
-                <svg class="button-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-                <span>Edit Mode</span>
-            </button>
 
             <div class="history-section">
                 <div class="history-header">
@@ -998,7 +1073,8 @@
                 currentData.tasks.push({
                     id: Date.now() + index,
                     text: taskText,
-                    completed: false
+                    completed: false,
+                    isTemplate: true  // Mark template tasks
                 });
             });
             currentData.totalTasks = templateTasks.length;
@@ -1126,6 +1202,13 @@
             
             if (saved) {
                 currentData = JSON.parse(saved);
+                // Backward compatibility: add isTemplate flag to existing tasks
+                currentData.tasks = currentData.tasks.map(task => {
+                    if (task.isTemplate === undefined) {
+                        task.isTemplate = true; // Default existing tasks to template
+                    }
+                    return task;
+                });
             }
             
             if (savedHistory) {
@@ -1139,18 +1222,18 @@
             localStorage.setItem('dailyChecklistHistory', JSON.stringify(history));
         }
         
-        // Save user's default task list template (only uncompleted tasks become the daily template)
+        // Save user's default task list template (only template tasks become the daily template)
         function saveUserDefaultTasks() {
-            // Save active (uncompleted) task texts - the master list for daily resets
-            const activeTaskTexts = currentData.tasks
-                .filter(t => !t.completed)
+            // Save template task texts - the master list for daily resets
+            const templateTaskTexts = currentData.tasks
+                .filter(t => !t.completed && t.isTemplate)
                 .map(t => t.text);
-            localStorage.setItem('userDefaultTasks', JSON.stringify(activeTaskTexts));
+            localStorage.setItem('userDefaultTasks', JSON.stringify(templateTaskTexts));
         }
 
         // Add new task
-        function addTask() {
-            const input = document.getElementById('taskInput');
+        function addTask(isTemplate) {
+            const input = isTemplate ? document.getElementById('templateInput') : document.getElementById('temporaryInput');
             const taskText = input.value.trim();
             
             if (!taskText) return;
@@ -1158,14 +1241,15 @@
             const task = {
                 id: Date.now(),
                 text: taskText,
-                completed: false
+                completed: false,
+                isTemplate: isTemplate
             };
             
             currentData.tasks.push(task);
             currentData.totalTasks++;
             
             input.value = '';
-            updateAddButtonState();
+            updateAddButtonStates();
             
             saveData();
             saveUserDefaultTasks();
@@ -1177,6 +1261,16 @@
                 const taskList = document.getElementById('taskList');
                 taskList.scrollTop = taskList.scrollHeight;
             }, 50);
+        }
+        
+        // Add template task
+        function addTemplateTask() {
+            addTask(true);
+        }
+        
+        // Add temporary task
+        function addTemporaryTask() {
+            addTask(false);
         }
 
         // Complete task
@@ -1221,14 +1315,13 @@
         // Render tasks
         function renderTasks() {
             const taskList = document.getElementById('taskList');
-            const editModeToggle = document.getElementById('editModeToggle');
-            const clearTasksButton = document.querySelector('.clear-tasks-button');
+            const editModeButton = document.getElementById('editModeToggle');
             const activeTasks = currentData.tasks.filter(t => !t.completed);
             
             if (activeTasks.length === 0) {
                 taskList.innerHTML = '<div class="empty-message">No tasks yet. Add one below!</div>';
-                editModeToggle.disabled = true;
-                clearTasksButton.style.display = 'none';
+                editModeButton.disabled = true;
+                editModeButton.style.display = 'none';
                 // Turn off edit mode if it's on
                 if (editModeEnabled) {
                     toggleEditMode();
@@ -1236,12 +1329,12 @@
                 return;
             }
             
-            // Enable edit mode button and show clear button when there are tasks
-            editModeToggle.disabled = false;
-            clearTasksButton.style.display = 'block';
+            // Enable and show edit mode button when there are tasks
+            editModeButton.disabled = false;
+            editModeButton.style.display = 'flex';
             
             taskList.innerHTML = activeTasks.map(task => `
-                <div class="task-item" data-task-id="${task.id}" draggable="true">
+                <div class="task-item ${task.isTemplate ? 'template-task' : 'temporary-task'}" data-task-id="${task.id}" draggable="true">
                     <input 
                         type="checkbox" 
                         class="task-checkbox" 
@@ -1329,8 +1422,11 @@
         function resetToday() {
             showConfirmModal(
                 'Reset Today',
-                'Are you sure you want to reset today\'s tasks? This cannot be undone.',
+                'Are you sure you want to reset today\'s tasks? This will reset template tasks but keep temporary tasks.',
                 () => {
+                    // Preserve temporary (non-template) tasks
+                    const temporaryTasks = currentData.tasks.filter(t => !t.isTemplate && !t.completed);
+                    
                     currentData.tasks = [];
                     currentData.totalTasks = 0;
                     currentData.completedTasks = 0;
@@ -1345,7 +1441,7 @@
                         toggleEditMode();
                     }
                     
-                    // Reload user's saved default tasks
+                    // Reload user's saved default tasks (template tasks)
                     const savedDefaultTasks = localStorage.getItem('userDefaultTasks');
                     if (savedDefaultTasks) {
                         const taskTexts = JSON.parse(savedDefaultTasks);
@@ -1353,11 +1449,23 @@
                             currentData.tasks.push({
                                 id: Date.now() + index,
                                 text: taskText,
-                                completed: false
+                                completed: false,
+                                isTemplate: true  // Mark as template task
                             });
                         });
                         currentData.totalTasks = taskTexts.length;
                     }
+                    
+                    // Add back temporary tasks
+                    temporaryTasks.forEach(task => {
+                        currentData.tasks.push({
+                            id: Date.now() + Math.random(), // New ID
+                            text: task.text,
+                            completed: false,
+                            isTemplate: false
+                        });
+                        currentData.totalTasks++;
+                    });
                     
                     saveData();
                     updateProgress();
@@ -1449,11 +1557,15 @@
             );
         }
 
-        // Update add button state
-        function updateAddButtonState() {
-            const input = document.getElementById('taskInput');
-            const button = document.getElementById('addButton');
-            button.disabled = !input.value.trim();
+        // Update add button states
+        function updateAddButtonStates() {
+            const templateInput = document.getElementById('templateInput');
+            const templateButton = document.getElementById('addTemplateButton');
+            const temporaryInput = document.getElementById('temporaryInput');
+            const temporaryButton = document.getElementById('addTemporaryButton');
+            
+            templateButton.disabled = !templateInput.value.trim();
+            temporaryButton.disabled = !temporaryInput.value.trim();
         }
 
         // Handle task text click based on mode
@@ -1499,12 +1611,18 @@
                         currentData.totalTasks--;
                     }
                     saveData();
-                    saveUserDefaultTasks();
+                    // Only save to template if deleting a template task
+                    if (task.isTemplate) {
+                        saveUserDefaultTasks();
+                    }
                     updateProgress();
                 } else if (newText !== task.text) {
                     task.text = newText;
                     saveData();
-                    saveUserDefaultTasks();
+                    // Only save to template if editing a template task
+                    if (task.isTemplate) {
+                        saveUserDefaultTasks();
+                    }
                 }
                 input.blur(); // Remove focus
                 renderTasks();
@@ -1539,8 +1657,9 @@
             // Apply edit mode state if active
             if (editModeEnabled) {
                 document.getElementById('taskList').classList.add('edit-mode');
-                document.getElementById('editModeToggle').classList.add('active');
-                document.getElementById('editModeToggle').textContent = '✓ Done Editing';
+                const toggleButton = document.getElementById('editModeToggle');
+                toggleButton.classList.add('active');
+                toggleButton.querySelector('span').textContent = 'Done Editing';
             }
         }
 
@@ -1576,20 +1695,14 @@
             const taskList = document.getElementById('taskList');
             const toggleButton = document.getElementById('editModeToggle');
             
-            const editIcon = `
-                <svg class="button-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-            `;
-            
             if (editModeEnabled) {
                 taskList.classList.add('edit-mode');
                 toggleButton.classList.add('active');
-                toggleButton.innerHTML = editIcon + '<span>Done Editing</span>';
+                toggleButton.querySelector('span').textContent = 'Done Editing';
             } else {
                 taskList.classList.remove('edit-mode');
                 toggleButton.classList.remove('active');
-                toggleButton.innerHTML = editIcon + '<span>Edit Mode</span>';
+                toggleButton.querySelector('span').textContent = 'Edit Mode';
             }
         }
 
@@ -1640,7 +1753,12 @@
                     currentData.tasks.splice(targetIndex, 0, draggedTask);
                     
                     saveData();
-                    saveUserDefaultTasks();
+                    
+                    // Only save to template if in edit mode (permanent change)
+                    if (editModeEnabled) {
+                        saveUserDefaultTasks();
+                    }
+                    
                     renderTasks();
                 }
             }
@@ -1651,22 +1769,32 @@
 
         // Setup event listeners
         function setupEventListeners() {
-            const input = document.getElementById('taskInput');
-            const addButton = document.getElementById('addButton');
+            const templateInput = document.getElementById('templateInput');
+            const templateButton = document.getElementById('addTemplateButton');
+            const temporaryInput = document.getElementById('temporaryInput');
+            const temporaryButton = document.getElementById('addTemporaryButton');
             const resetButton = document.getElementById('resetButton');
             
-            addButton.addEventListener('click', addTask);
+            templateButton.addEventListener('click', addTemplateTask);
+            temporaryButton.addEventListener('click', addTemporaryTask);
             resetButton.addEventListener('click', resetToday);
             
-            input.addEventListener('input', updateAddButtonState);
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    addTask();
+            templateInput.addEventListener('input', updateAddButtonStates);
+            templateInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !templateButton.disabled) {
+                    addTemplateTask();
                 }
             });
             
-            // Initial button state
-            updateAddButtonState();
+            temporaryInput.addEventListener('input', updateAddButtonStates);
+            temporaryInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !temporaryButton.disabled) {
+                    addTemporaryTask();
+                }
+            });
+            
+            // Initial button states
+            updateAddButtonStates();
         }
 
         // Escape HTML
