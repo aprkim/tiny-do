@@ -30,7 +30,217 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: #FAFAFA;
             min-height: 100vh;
+        }
+
+        body.has-nav {
             padding-bottom: 70px;
+        }
+
+        /* ==================== ONBOARDING VIEW ==================== */
+        .onboarding {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #FEF2F2 0%, #FAFAFA 100%);
+            padding: 40px 20px;
+        }
+
+        .onboarding-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .onboarding-logo {
+            width: 80px;
+            height: 80px;
+            background: #BF3143;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 24px rgba(191, 49, 67, 0.3);
+        }
+
+        .onboarding-logo svg {
+            width: 48px;
+            height: 48px;
+            fill: white;
+        }
+
+        .onboarding-title {
+            font-size: 32px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .onboarding-subtitle {
+            font-size: 16px;
+            color: #64748B;
+            max-width: 300px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .onboarding-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .template-cards {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .template-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .template-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .template-card.selected {
+            border-color: #BF3143;
+            background: #FEF7F8;
+        }
+
+        .template-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .template-card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .template-card-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .template-card-icon.productivity { background: #BF3143; }
+        .template-card-icon.wellness { background: #16A34A; }
+        .template-card-icon.workday { background: #3B82F6; }
+        .template-card-icon.weekend { background: #F59E0B; }
+        .template-card-icon.student { background: #8B5CF6; }
+        .template-card-icon.blank { background: #64748B; }
+
+        .template-card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .template-card-description {
+            font-size: 13px;
+            color: #64748B;
+        }
+
+        .template-card-tasks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .template-card-task {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #64748B;
+        }
+
+        .template-card-task::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: #CBD5E1;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .template-card.blank-card {
+            background: #F8FAFC;
+            border: 2px dashed #CBD5E1;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .template-card.blank-card:hover {
+            border-color: #94A3B8;
+            background: white;
+        }
+
+        .template-card.blank-card.selected {
+            border-style: solid;
+            border-color: #BF3143;
+            background: #FEF7F8;
+        }
+
+        .blank-card-icon {
+            width: 48px;
+            height: 48px;
+            background: #E2E8F0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .blank-card-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: #64748B;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .onboarding-btn {
+            display: block;
+            width: 100%;
+            max-width: 500px;
+            margin: 24px auto 0;
+            padding: 16px;
+            background: #BF3143;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .onboarding-btn:hover {
+            background: #A02838;
+        }
+
+        .onboarding-btn:disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
         }
 
         /* ==================== BOTTOM NAVIGATION ==================== */
@@ -46,6 +256,10 @@
             padding: 8px 0;
             z-index: 100;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .bottom-nav.hidden {
+            display: none;
         }
 
         .nav-tab {
@@ -399,6 +613,24 @@
             background: #E2E8F0;
         }
 
+        /* ==================== CHANGE TEMPLATE LINK ==================== */
+        .change-template-link {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .change-template-link a {
+            color: #64748B;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .change-template-link a:hover {
+            color: #BF3143;
+            text-decoration: underline;
+        }
+
         /* ==================== TEMPLATES TAB ==================== */
         .template-tabs {
             display: flex;
@@ -660,6 +892,14 @@
                 padding: 12px;
             }
 
+            .onboarding {
+                padding: 24px 16px;
+            }
+
+            .onboarding-title {
+                font-size: 28px;
+            }
+
             .header {
                 padding: 20px;
             }
@@ -683,8 +923,31 @@
     </style>
 </head>
 <body>
+    <!-- ==================== ONBOARDING VIEW ==================== -->
+    <div id="view-onboarding" class="view">
+        <div class="onboarding">
+            <div class="onboarding-header">
+                <div class="onboarding-logo">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 3v18l7-5 7 5V3H5z"/>
+                    </svg>
+                </div>
+                <h1 class="onboarding-title">Tiny Wins</h1>
+                <p class="onboarding-subtitle">Build your daily routine, one tiny win at a time.</p>
+            </div>
+
+            <h2 class="onboarding-section-title">Choose Your Daily Template</h2>
+
+            <div class="template-cards" id="templateCards">
+                <!-- Template cards will be inserted here -->
+            </div>
+
+            <button class="onboarding-btn" id="startBtn" disabled>Get Started</button>
+        </div>
+    </div>
+
     <!-- ==================== TODAY VIEW ==================== -->
-    <div id="view-today" class="view active">
+    <div id="view-today" class="view">
         <div class="container">
             <div class="header">
                 <div class="header-title">Today's Tasks</div>
@@ -720,7 +983,7 @@
 
             <div class="add-task-section">
                 <div class="section-title" style="margin-bottom: 12px;">
-                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="#64748B" stroke-width="2" fill="none">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="#F59E0B" stroke-width="2" fill="none">
                         <path d="M12 4v16m8-8H4"/>
                     </svg>
                     Quick Add (One-Time)
@@ -735,8 +998,12 @@
                 <svg viewBox="0 0 24 24">
                     <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                 </svg>
-                Reload from Template
+                Reset Today
             </button>
+
+            <div class="change-template-link">
+                <a onclick="showChangeTemplateModal()">Change Template</a>
+            </div>
         </div>
     </div>
 
@@ -780,7 +1047,7 @@
             </div>
 
             <div class="footer">
-                Changes auto-save • Takes effect on next day
+                Changes auto-save • Takes effect on next reload
             </div>
         </div>
     </div>
@@ -805,7 +1072,7 @@
     </div>
 
     <!-- ==================== BOTTOM NAVIGATION ==================== -->
-    <nav class="bottom-nav">
+    <nav class="bottom-nav hidden" id="bottomNav">
         <button class="nav-tab active" data-tab="today">
             <svg viewBox="0 0 24 24">
                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
@@ -841,6 +1108,7 @@
     <script>
         // ==================== STORAGE KEYS ====================
         const STORAGE_KEYS = {
+            SETUP_COMPLETE: 'tinyWins_setupComplete',
             LAST_TAB: 'tinyWins_lastActiveTab',
             TEMPLATES: 'tinyWins_templates',
             TODAY_TASKS: 'tinyWins_todayTasks',
@@ -849,8 +1117,74 @@
             HISTORY: 'tinyWins_history'
         };
 
+        // ==================== SAMPLE TEMPLATES ====================
+        const SAMPLE_TEMPLATES = {
+            productivity: {
+                name: "Daily Productivity",
+                description: "Start each day with intention",
+                icon: "productivity",
+                tasks: [
+                    "Make bed",
+                    "Review today's priorities",
+                    "Deep work session (1 hour)",
+                    "Read 1 article",
+                    "Plan tomorrow"
+                ]
+            },
+            wellness: {
+                name: "Health & Wellness",
+                description: "Focus on your wellbeing",
+                icon: "wellness",
+                tasks: [
+                    "Drink 500ml water",
+                    "Take supplements",
+                    "Exercise 20-30 mins",
+                    "Eat balanced breakfast",
+                    "Stretch 5 mins"
+                ]
+            },
+            workday: {
+                name: "Workday Focused",
+                description: "Maximize your work hours",
+                icon: "workday",
+                tasks: [
+                    "Morning check-in",
+                    "Inbox zero attempt",
+                    "Complete 1 major task",
+                    "Take a real break",
+                    "Wrap up + plan next day"
+                ]
+            },
+            weekend: {
+                name: "Weekend Reset",
+                description: "Recharge and reset",
+                icon: "weekend",
+                tasks: [
+                    "Slow morning",
+                    "Family/friend time",
+                    "Exercise 30 min",
+                    "House reset 15 min",
+                    "Read or relax"
+                ]
+            },
+            student: {
+                name: "Student Mode",
+                description: "Stay on top of learning",
+                icon: "student",
+                tasks: [
+                    "Review notes",
+                    "Study 1 hour",
+                    "Practice skill 20 min",
+                    "Spaced repetition session",
+                    "Write mini-reflection"
+                ]
+            }
+        };
+
         // ==================== STATE ====================
         let state = {
+            setupComplete: false,
+            selectedTemplate: null,
             activeTab: 'today',
             activeTemplateMode: 'weekday',
             todayTasks: [],
@@ -864,66 +1198,166 @@
             history: []
         };
 
-        // ==================== DEFAULT TEMPLATES ====================
-        const DEFAULT_TEMPLATES = {
-            weekday: [
-                { id: 1, text: "Morning routine completed" },
-                { id: 2, text: "Review today's priorities" },
-                { id: 3, text: "Focus work session" },
-                { id: 4, text: "Exercise or movement" },
-                { id: 5, text: "Drink 8 glasses of water" }
-            ],
-            weekend: [
-                { id: 1, text: "Sleep in or wake naturally" },
-                { id: 2, text: "Enjoy a leisurely breakfast" },
-                { id: 3, text: "Spend time with family/friends" },
-                { id: 4, text: "Hobby or personal project" },
-                { id: 5, text: "Prepare for the week ahead" }
-            ],
-            holiday: [
-                { id: 1, text: "Relax and recharge" },
-                { id: 2, text: "Do something you enjoy" },
-                { id: 3, text: "Connect with loved ones" }
-            ]
+        // ==================== ICONS ====================
+        const ICONS = {
+            productivity: '<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>',
+            wellness: '<path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>',
+            workday: '<path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>',
+            weekend: '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>',
+            student: '<path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/><path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/>',
+            blank: '<path d="M12 4v16m8-8H4"/>'
         };
 
         // ==================== INITIALIZATION ====================
         function init() {
+            migrateOldData();
             loadState();
-            checkDateChange();
-            renderBottomNav();
-            switchTab(state.activeTab);
-            setupEventListeners();
+            
+            if (!state.setupComplete) {
+                showOnboarding();
+            } else {
+                showMainApp();
+            }
         }
 
         function loadState() {
-            // Load last active tab
+            state.setupComplete = localStorage.getItem(STORAGE_KEYS.SETUP_COMPLETE) === 'true';
             state.activeTab = localStorage.getItem(STORAGE_KEYS.LAST_TAB) || 'today';
             
-            // Load templates
             const savedTemplates = localStorage.getItem(STORAGE_KEYS.TEMPLATES);
             if (savedTemplates) {
                 state.templates = JSON.parse(savedTemplates);
-            } else {
-                state.templates = JSON.parse(JSON.stringify(DEFAULT_TEMPLATES));
-                saveTemplates();
             }
             
-            // Load today's tasks
             const savedTodayTasks = localStorage.getItem(STORAGE_KEYS.TODAY_TASKS);
             if (savedTodayTasks) {
                 state.todayTasks = JSON.parse(savedTodayTasks);
             }
             
-            // Load today's mode and date
             state.todayMode = localStorage.getItem(STORAGE_KEYS.TODAY_MODE) || getDayMode();
             state.todayDate = localStorage.getItem(STORAGE_KEYS.TODAY_DATE) || getTodayString();
             
-            // Load history
             const savedHistory = localStorage.getItem(STORAGE_KEYS.HISTORY);
             if (savedHistory) {
                 state.history = JSON.parse(savedHistory);
             }
+        }
+
+        // ==================== ONBOARDING ====================
+        function showOnboarding() {
+            document.body.classList.remove('has-nav');
+            document.getElementById('bottomNav').classList.add('hidden');
+            
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById('view-onboarding').classList.add('active');
+            
+            renderTemplateCards();
+            setupOnboardingListeners();
+        }
+
+        function renderTemplateCards() {
+            const container = document.getElementById('templateCards');
+            
+            let html = '';
+            
+            // Sample templates
+            Object.entries(SAMPLE_TEMPLATES).forEach(([key, template]) => {
+                html += `
+                    <div class="template-card" data-template="${key}" onclick="selectTemplate('${key}')">
+                        <div class="template-card-header">
+                            <div class="template-card-icon ${template.icon}">
+                                <svg viewBox="0 0 24 24">${ICONS[template.icon]}</svg>
+                            </div>
+                            <div>
+                                <div class="template-card-title">${template.name}</div>
+                                <div class="template-card-description">${template.description}</div>
+                            </div>
+                        </div>
+                        <div class="template-card-tasks">
+                            ${template.tasks.slice(0, 3).map(t => `<div class="template-card-task">${t}</div>`).join('')}
+                            ${template.tasks.length > 3 ? `<div class="template-card-task">+${template.tasks.length - 3} more...</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Blank template option
+            html += `
+                <div class="template-card blank-card" data-template="blank" onclick="selectTemplate('blank')">
+                    <div class="blank-card-icon">
+                        <svg viewBox="0 0 24 24">${ICONS.blank}</svg>
+                    </div>
+                    <div class="template-card-title">Start from Scratch</div>
+                    <div class="template-card-description">Create your own custom template</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+
+        function selectTemplate(templateKey) {
+            state.selectedTemplate = templateKey;
+            
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.toggle('selected', card.dataset.template === templateKey);
+            });
+            
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function setupOnboardingListeners() {
+            document.getElementById('startBtn').addEventListener('click', completeOnboarding);
+        }
+
+        function completeOnboarding() {
+            if (!state.selectedTemplate) return;
+            
+            // Set up templates based on selection
+            if (state.selectedTemplate === 'blank') {
+                state.templates = {
+                    weekday: [],
+                    weekend: [],
+                    holiday: []
+                };
+            } else {
+                const template = SAMPLE_TEMPLATES[state.selectedTemplate];
+                state.templates = {
+                    weekday: template.tasks.map((text, i) => ({ id: Date.now() + i, text })),
+                    weekend: SAMPLE_TEMPLATES.weekend.tasks.map((text, i) => ({ id: Date.now() + 100 + i, text })),
+                    holiday: [
+                        { id: Date.now() + 200, text: "Relax and recharge" },
+                        { id: Date.now() + 201, text: "Do something you enjoy" },
+                        { id: Date.now() + 202, text: "Connect with loved ones" }
+                    ]
+                };
+            }
+            
+            state.setupComplete = true;
+            state.todayDate = getTodayString();
+            state.todayMode = getDayMode();
+            
+            // Initialize today's tasks from template
+            loadTasksForDayMode();
+            
+            // Save everything
+            localStorage.setItem(STORAGE_KEYS.SETUP_COMPLETE, 'true');
+            saveTemplates();
+            saveTodayTasks();
+            localStorage.setItem(STORAGE_KEYS.TODAY_DATE, state.todayDate);
+            localStorage.setItem(STORAGE_KEYS.TODAY_MODE, state.todayMode);
+            
+            showMainApp();
+        }
+
+        // ==================== MAIN APP ====================
+        function showMainApp() {
+            document.body.classList.add('has-nav');
+            document.getElementById('bottomNav').classList.remove('hidden');
+            
+            checkDateChange();
+            renderBottomNav();
+            switchTab(state.activeTab);
+            setupEventListeners();
         }
 
         function checkDateChange() {
@@ -941,7 +1375,7 @@
                         isTemplate: false
                     }));
                 
-                // Save previous day to history if there were tasks
+                // Save previous day to history
                 if (state.todayTasks.length > 0) {
                     const completed = state.todayTasks.filter(t => t.completed).length;
                     const total = state.todayTasks.length;
@@ -954,17 +1388,15 @@
                         percentage: total > 0 ? Math.round((completed / total) * 100) : 0
                     });
                     
-                    // Keep only last 30 days
                     state.history = state.history.slice(0, 30);
                     saveHistory();
                 }
                 
-                // Load new day's tasks from template
                 state.todayDate = today;
                 state.todayMode = currentMode;
                 loadTasksForDayMode();
                 
-                // Add carried over one-time tasks
+                // Add carried over tasks
                 state.todayTasks = [...state.todayTasks, ...carryOverTasks];
                 saveTodayTasks();
                 
@@ -975,9 +1407,7 @@
 
         // ==================== DAY MODE ====================
         function getDayMode() {
-            const today = new Date();
-            const day = today.getDay();
-            // 0 = Sunday, 6 = Saturday
+            const day = new Date().getDay();
             return (day === 0 || day === 6) ? 'weekend' : 'weekday';
         }
 
@@ -994,8 +1424,7 @@
 
         // ==================== DATE UTILITIES ====================
         function getTodayString() {
-            const today = new Date();
-            return today.toISOString().split('T')[0];
+            return new Date().toISOString().split('T')[0];
         }
 
         function formatDate(dateString) {
@@ -1022,25 +1451,18 @@
             state.activeTab = tabName;
             localStorage.setItem(STORAGE_KEYS.LAST_TAB, tabName);
             
-            // Update nav tabs
             document.querySelectorAll('.nav-tab').forEach(tab => {
                 tab.classList.toggle('active', tab.dataset.tab === tabName);
             });
             
-            // Update views
             document.querySelectorAll('.view').forEach(view => {
                 view.classList.remove('active');
             });
             document.getElementById(`view-${tabName}`).classList.add('active');
             
-            // Load view content
-            if (tabName === 'today') {
-                loadTodayView();
-            } else if (tabName === 'templates') {
-                loadTemplatesView();
-            } else if (tabName === 'history') {
-                loadHistoryView();
-            }
+            if (tabName === 'today') loadTodayView();
+            else if (tabName === 'templates') loadTemplatesView();
+            else if (tabName === 'history') loadHistoryView();
         }
 
         function renderBottomNav() {
@@ -1051,7 +1473,6 @@
 
         // ==================== TODAY VIEW ====================
         function loadTodayView() {
-            // Update header
             document.getElementById('todayDate').textContent = formatDate(state.todayDate);
             
             const modeEl = document.getElementById('todayMode');
@@ -1059,10 +1480,7 @@
             modeEl.className = 'header-mode ' + state.todayMode;
             modeText.textContent = state.todayMode.charAt(0).toUpperCase() + state.todayMode.slice(1);
             
-            // Update progress
             updateProgressBar();
-            
-            // Render tasks
             renderTodayTasks();
         }
 
@@ -1071,7 +1489,7 @@
             const activeTasks = state.todayTasks.filter(t => !t.completed);
             
             if (activeTasks.length === 0) {
-                taskList.innerHTML = '<div class="empty-message">All done! 🎉 Add more tasks or reload from template.</div>';
+                taskList.innerHTML = '<div class="empty-message">All done! 🎉 Add more tasks or reset today.</div>';
                 return;
             }
             
@@ -1128,19 +1546,13 @@
 
         function reloadFromTemplate() {
             showConfirmModal(
-                'Reload Template',
+                'Reset Today',
                 'This will reset routine tasks. One-time tasks will be kept.',
                 () => {
-                    // Preserve uncompleted one-time tasks
-                    const oneTimeTasks = state.todayTasks
-                        .filter(t => !t.isTemplate && !t.completed);
-                    
+                    const oneTimeTasks = state.todayTasks.filter(t => !t.isTemplate && !t.completed);
                     loadTasksForDayMode();
-                    
-                    // Add back one-time tasks
                     state.todayTasks = [...state.todayTasks, ...oneTimeTasks];
                     saveTodayTasks();
-                    
                     renderTodayTasks();
                     updateProgressBar();
                 }
@@ -1152,10 +1564,22 @@
             const completed = state.todayTasks.filter(t => t.completed).length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
-            document.getElementById('progressLabel').textContent = 
-                `${completed} of ${total} tasks completed`;
+            document.getElementById('progressLabel').textContent = `${completed} of ${total} tasks completed`;
             document.getElementById('progressBar').style.width = `${percentage}%`;
             document.getElementById('progressPercentage').textContent = `${percentage}%`;
+        }
+
+        function showChangeTemplateModal() {
+            showConfirmModal(
+                'Change Template',
+                'This will take you back to template selection and reset your current templates.',
+                () => {
+                    localStorage.removeItem(STORAGE_KEYS.SETUP_COMPLETE);
+                    state.setupComplete = false;
+                    state.selectedTemplate = null;
+                    showOnboarding();
+                }
+            );
         }
 
         // ==================== TEMPLATES VIEW ====================
@@ -1169,11 +1593,7 @@
                 tab.classList.toggle('active', tab.dataset.mode === state.activeTemplateMode);
             });
             
-            const titles = {
-                weekday: 'Weekday Tasks',
-                weekend: 'Weekend Tasks',
-                holiday: 'Holiday Tasks'
-            };
+            const titles = { weekday: 'Weekday Tasks', weekend: 'Weekend Tasks', holiday: 'Holiday Tasks' };
             document.getElementById('templateSectionTitle').innerHTML = `
                 <svg viewBox="0 0 24 24">
                     <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -1214,10 +1634,7 @@
             const text = input.value.trim();
             if (!text) return;
             
-            state.templates[state.activeTemplateMode].push({
-                id: Date.now(),
-                text: text
-            });
+            state.templates[state.activeTemplateMode].push({ id: Date.now(), text });
             
             input.value = '';
             document.getElementById('templateAddBtn').disabled = true;
@@ -1235,9 +1652,7 @@
         // ==================== HISTORY VIEW ====================
         function loadHistoryView() {
             renderHistoryList();
-            
-            const clearBtn = document.getElementById('clearHistoryBtn');
-            clearBtn.style.display = state.history.length > 0 ? 'flex' : 'none';
+            document.getElementById('clearHistoryBtn').style.display = state.history.length > 0 ? 'flex' : 'none';
         }
 
         function renderHistoryList() {
@@ -1263,15 +1678,11 @@
         }
 
         function clearHistory() {
-            showConfirmModal(
-                'Clear History',
-                'This will delete all history. This cannot be undone.',
-                () => {
-                    state.history = [];
-                    saveHistory();
-                    loadHistoryView();
-                }
-            );
+            showConfirmModal('Clear History', 'This will delete all history. This cannot be undone.', () => {
+                state.history = [];
+                saveHistory();
+                loadHistoryView();
+            });
         }
 
         // ==================== STORAGE ====================
@@ -1393,13 +1804,11 @@
 
         // ==================== MIGRATION ====================
         function migrateOldData() {
-            // Check for old data format
             const oldData = localStorage.getItem('dailyChecklistData');
             const oldHistory = localStorage.getItem('dailyChecklistHistory');
             const oldDefaultTasks = localStorage.getItem('userDefaultTasks');
             
             if (oldData || oldHistory || oldDefaultTasks) {
-                // Migrate old data to new format
                 if (oldDefaultTasks) {
                     try {
                         const tasks = JSON.parse(oldDefaultTasks);
@@ -1422,17 +1831,19 @@
                     } catch (e) {}
                 }
                 
-                // Clear old data
                 localStorage.removeItem('dailyChecklistData');
                 localStorage.removeItem('dailyChecklistHistory');
                 localStorage.removeItem('userDefaultTasks');
                 localStorage.removeItem('setupComplete');
                 localStorage.removeItem('activeDate');
+                
+                // Mark setup as complete if migrating old data
+                localStorage.setItem(STORAGE_KEYS.SETUP_COMPLETE, 'true');
+                state.setupComplete = true;
             }
         }
 
         // ==================== START ====================
-        migrateOldData();
         init();
     </script>
 </body>
