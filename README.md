@@ -28,12 +28,15 @@ Tiny Wins is a minimalist daily task management app designed to help you build c
 - **Weekday Template** - Your Monday-Friday routine
 - **Weekend Template** - Your Saturday-Sunday routine  
 - **Special Day Template** - For holidays, birthdays, or any special occasion
-- Auto-detects the current day type and loads the appropriate template
+- **Auto-Detection** - Automatically loads Weekday or Weekend based on current day
+- **Manual Override** - Click the day mode pill to manually choose any template for today
+- **Smart Expiration** - Manual selections apply only to that calendar day
 - Choose from pre-built templates or start from scratch
 
 ### Core Functionality
 
 - ✅ **Visual Progress** - Real-time progress bar with percentage
+- 🔄 **Manual Template Selection** - Click the day mode pill to switch between Weekday, Weekend, or Special Day
 - 🎯 **Drag & Drop** - Reorder tasks on Today (temporary) or Templates (permanent)
 - 🗑️ **Easy Management** - Delete individual tasks or clear entire templates
 - 🎉 **Confetti Celebration** - Rewarded when you complete all tasks
@@ -46,7 +49,11 @@ Tiny Wins is a minimalist daily task management app designed to help you build c
 - **Today's Tasks**: Reordering is temporary (for today only)
 - **Template Tasks**: Reordering is permanent (saved to template)
 - **One-Time Tasks**: Automatically carry over to the next day if uncompleted
-- **Reset Today**: Reload your template while keeping one-time tasks
+- **Manual Override**: Choose any template for today by clicking the day mode pill
+  - Applies only to that calendar date
+  - Tomorrow automatically reverts to Weekday/Weekend detection
+  - Perfect for holidays, vacation days, or any special occasion
+- **Reset Today**: Reloads your currently selected template while keeping one-time tasks
 - **Day Change Detection**: Automatically loads the correct template when date changes
 
 ## 🚀 Getting Started
@@ -106,6 +113,7 @@ All data is stored locally in your browser using these keys:
 - `tinyWins_todayTasks` - Current day's task list
 - `tinyWins_todayDate` - Current date tracking
 - `tinyWins_todayMode` - Current day mode (weekday/weekend/holiday)
+- `tinyWins_todayModeOverride` - Manual template selection (per-date override)
 - `tinyWins_history` - Past 30 days of completion data
 - `tinyWins_lastActiveTab` - Remembers your last active tab
 - `tinyWins_setupComplete` - Onboarding completion flag
@@ -118,6 +126,8 @@ Tiny Wins is built on the belief that **consistent small actions lead to signifi
 
 ## 🔄 Recent Updates
 
+- **Manual Template Selection** - Click the day mode pill to choose any template for today
+- **Color-Matched Modal** - Template selector with pill-themed design
 - **Three-Tab Interface** - Streamlined navigation (Today, Templates, History)
 - **Template System** - Separate routines for Weekday, Weekend, Special Day
 - **Drag & Drop** - Reorder tasks with visual drag handles
