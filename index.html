@@ -812,6 +812,11 @@
             color: #6E6282;
         }
 
+        .history-mode.holiday {
+            background: #F4F7F4;
+            color: #5C6D5F;
+        }
+
         .history-stats {
             display: flex;
             justify-content: space-between;
@@ -1074,7 +1079,7 @@
             <div class="template-tabs">
                 <button class="template-tab active" data-mode="weekday">Weekday</button>
                 <button class="template-tab" data-mode="weekend">Weekend</button>
-                <button class="template-tab" data-mode="holiday">Holiday</button>
+                <button class="template-tab" data-mode="holiday">Special Day</button>
             </div>
 
             <div class="task-section">
@@ -1491,6 +1496,15 @@
             return `${year}-${month}-${day}`;
         }
 
+        function formatModeName(mode) {
+            const modeNames = {
+                weekday: 'Weekday',
+                weekend: 'Weekend',
+                holiday: 'Special Day'
+            };
+            return modeNames[mode] || mode;
+        }
+
         function formatDate(dateString) {
             const date = new Date(dateString + 'T00:00:00');
             return date.toLocaleDateString('en-US', {
@@ -1542,7 +1556,7 @@
             const modeEl = document.getElementById('todayMode');
             const modeText = document.getElementById('todayModeText');
             modeEl.className = 'header-mode ' + state.todayMode;
-            modeText.textContent = state.todayMode.charAt(0).toUpperCase() + state.todayMode.slice(1);
+            modeText.textContent = formatModeName(state.todayMode);
             
             updateProgressBar();
             renderTodayTasks();
@@ -1669,7 +1683,7 @@
                 tab.classList.toggle('active', tab.dataset.mode === state.activeTemplateMode);
             });
             
-            const titles = { weekday: 'Weekday Tasks', weekend: 'Weekend Tasks', holiday: 'Holiday Tasks' };
+            const titles = { weekday: 'Weekday Tasks', weekend: 'Weekend Tasks', holiday: 'Special Day Tasks' };
             document.getElementById('templateSectionTitle').innerHTML = `
                 <svg viewBox="0 0 24 24">
                     <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
@@ -1746,7 +1760,7 @@
             const modeNames = {
                 weekday: 'Weekday',
                 weekend: 'Weekend',
-                holiday: 'Holiday'
+                holiday: 'Special Day'
             };
             
             showConfirmModal(
@@ -1778,7 +1792,7 @@
                 <div class="history-item">
                     <div class="history-item-header">
                         <span class="history-date">${formatDateShort(entry.date)}</span>
-                        <span class="history-mode ${entry.mode}">${entry.mode}</span>
+                        <span class="history-mode ${entry.mode}">${formatModeName(entry.mode)}</span>
                     </div>
                     <div class="history-stats">
                         <span class="history-completion">${entry.tasksCompleted} / ${entry.tasksTotal} completed</span>

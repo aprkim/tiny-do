@@ -6,42 +6,58 @@
 
 ## 🌟 Overview
 
-Tiny Wins is a minimalist daily task management app designed to help you build consistent habits through small, achievable daily goals. Unlike traditional to-do apps, Tiny Wins distinguishes between **recurring daily habits** and **one-time tasks**, making it perfect for habit tracking.
+Tiny Wins is a minimalist daily task management app designed to help you build consistent habits through small, achievable daily goals. Unlike traditional to-do apps, Tiny Wins features customizable **template-based routines** for weekdays, weekends, and special days, plus support for **one-time tasks**.
 
 ## ✨ Features
 
+### Three-Tab Navigation
+
+- **📅 Today** - Your daily task list with progress tracking
+- **📋 Templates** - Customize routines for Weekday, Weekend, and Special Day
+- **📜 History** - View past performance and completion rates
+
 ### Two Types of Tasks
 
-| Task Type | Color | Behavior |
-|-----------|-------|----------|
-| **Daily Template** | Warm beige border | Resets every day - perfect for habits |
-| **One-Time Task** | Cool gray border | Stays until completed - for temporary todos |
+| Task Type | Visual Style | Behavior |
+|-----------|--------------|----------|
+| **Routine Tasks** | Warm beige background | From templates, resets daily - perfect for habits |
+| **One-Time Tasks** | Light blue background with border | Added on-the-fly, carries over until completed |
+
+### Smart Template System
+
+- **Weekday Template** - Your Monday-Friday routine
+- **Weekend Template** - Your Saturday-Sunday routine  
+- **Special Day Template** - For holidays, birthdays, or any special occasion
+- Auto-detects the current day type and loads the appropriate template
+- Choose from pre-built templates or start from scratch
 
 ### Core Functionality
 
-- 📋 **Template System** - Choose from pre-built templates or create your own daily checklist
-- ✏️ **Edit Mode** - Reorder tasks, edit text, or delete items
-- 📊 **Progress Tracking** - Visual progress bar showing daily completion
-- 📜 **History** - View your past performance and completion rates
-- 🎉 **Confetti Celebration** - Get rewarded when you complete all tasks!
-- 💾 **Auto-Save** - All data persists in local storage
-- 📱 **Mobile Responsive** - Works beautifully on all devices
+- ✅ **Visual Progress** - Real-time progress bar with percentage
+- 🎯 **Drag & Drop** - Reorder tasks on Today (temporary) or Templates (permanent)
+- 🗑️ **Easy Management** - Delete individual tasks or clear entire templates
+- 🎉 **Confetti Celebration** - Rewarded when you complete all tasks
+- 💾 **Auto-Save** - Everything persists in browser storage
+- 📱 **Mobile First** - Beautiful responsive design
+- 🕐 **Timezone Smart** - Uses your local time for accurate day detection
 
 ### Smart Behavior
 
-- **Temporary Reordering**: Drag tasks to reorder for today without affecting your template
-- **Permanent Reordering**: Use Edit Mode to permanently change your template order
-- **Reset Today**: Reloads your daily template while preserving one-time tasks
+- **Today's Tasks**: Reordering is temporary (for today only)
+- **Template Tasks**: Reordering is permanent (saved to template)
+- **One-Time Tasks**: Automatically carry over to the next day if uncompleted
+- **Reset Today**: Reload your template while keeping one-time tasks
+- **Day Change Detection**: Automatically loads the correct template when date changes
 
 ## 🚀 Getting Started
 
 ### Option 1: Use Online
-Visit: [https://aprkim.github.io/tiny-win2/](https://aprkim.github.io/tiny-win2/)
+Visit: [https://aprkim.github.io/tiny-wins/](https://aprkim.github.io/tiny-wins/)
 
 ### Option 2: Run Locally
 1. Clone the repository:
    ```bash
-   git clone https://github.com/aprkim/tiny-win2.git
+   git clone https://github.com/aprkim/tiny-wins.git
    ```
 2. Open `index.html` in your browser
 
@@ -50,33 +66,49 @@ For the best experience, add Tiny Wins to your phone's home screen:
 - **iOS**: Tap Share → Add to Home Screen
 - **Android**: Tap Menu → Add to Home Screen
 
-## 🎨 Templates
+## 🎨 Onboarding Templates
 
-Choose from built-in templates or start fresh:
+Choose from built-in templates to get started quickly:
 
-- **Empty List** - Start from scratch
-- **Daily Productivity** - Morning routine, focus time, exercise
-- **Health & Wellness** - Fitness, nutrition, mindfulness
-- **Student Life** - Study sessions, assignments, classes
-- **Remote Worker** - Work-from-home routine and boundaries
+- **Daily Productivity** - Morning routine, deep work, planning
+- **Health & Wellness** - Exercise, nutrition, hydration
+- **Workday Focused** - Inbox management, breaks, task completion
+- **Weekend Reset** - Slow morning, family time, house reset
+- **Student Mode** - Study sessions, practice, reviews
+- **Start from Scratch** - Build your own custom template
+
+Each template initializes your Weekday routine, with a relaxing Weekend template automatically included.
 
 ## 🛠️ Technical Details
 
-- **Built with**: Vanilla HTML, CSS, and JavaScript
+- **Built with**: Vanilla HTML, CSS, and JavaScript (single-file app)
 - **Storage**: Browser LocalStorage
-- **Dependencies**: None
+- **Dependencies**: Zero external dependencies
 - **Hosting**: GitHub Pages
+- **Architecture**: Single Page Application (SPA)
 
 ## 📁 Project Structure
 
 ```
-tiny-win2/
-├── index.html      # Main application (single-file app)
-├── favicon.svg     # Browser tab icon
-├── og-image.png    # Social media preview image
-├── og-image.svg    # Source for preview image
-└── README.md       # This file
+tiny-wins/
+├── index.html         # Complete application (HTML + CSS + JS)
+├── favicon.svg        # Browser tab icon
+├── og-image.png       # Social media preview image
+├── og-image.svg       # Source for preview image
+├── test_storage.html  # LocalStorage testing utility
+└── README.md          # This file
 ```
+
+## 💾 Data Storage
+
+All data is stored locally in your browser using these keys:
+- `tinyWins_templates` - Your Weekday, Weekend, Special Day templates
+- `tinyWins_todayTasks` - Current day's task list
+- `tinyWins_todayDate` - Current date tracking
+- `tinyWins_todayMode` - Current day mode (weekday/weekend/holiday)
+- `tinyWins_history` - Past 30 days of completion data
+- `tinyWins_lastActiveTab` - Remembers your last active tab
+- `tinyWins_setupComplete` - Onboarding completion flag
 
 ## 🎯 Philosophy
 
@@ -84,13 +116,23 @@ Tiny Wins is built on the belief that **consistent small actions lead to signifi
 
 > "A journey of a thousand miles begins with a single step." — Lao Tzu
 
+## 🔄 Recent Updates
+
+- **Three-Tab Interface** - Streamlined navigation (Today, Templates, History)
+- **Template System** - Separate routines for Weekday, Weekend, Special Day
+- **Drag & Drop** - Reorder tasks with visual drag handles
+- **Timezone Fix** - Accurate local time detection
+- **One-Time Tasks** - Blue-tinted cards that carry over until completed
+- **Clear All** - Quick way to reset individual templates
+- **Improved Mobile UI** - Better touch targets and spacing
+
 ## 📝 License
 
 MIT License - Feel free to use, modify, and distribute.
 
 ## 👩‍💻 Author
 
-Created by [April Kim](mailto:aprkim@gmail.com) • 2025
+Created by April Kim • 2025
 
 ---
 
