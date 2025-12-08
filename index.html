@@ -426,7 +426,28 @@
             margin-bottom: 10px;
             transition: all 0.3s ease;
             border: 2px solid transparent;
+        }
+
+        .drag-handle {
+            width: 20px;
+            height: 20px;
             cursor: move;
+            margin-right: 12px;
+            color: #CBD5E1;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drag-handle:hover {
+            color: #94A3B8;
+        }
+
+        .drag-handle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
         }
 
         .task-item.template-task {
@@ -656,8 +677,29 @@
             border-radius: 12px;
             margin-bottom: 10px;
             border: 2px solid transparent;
-            cursor: move;
             transition: all 0.3s ease;
+        }
+
+        .template-item .drag-handle {
+            width: 20px;
+            height: 20px;
+            cursor: move;
+            margin-right: 12px;
+            color: #CBD5E1;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .template-item .drag-handle:hover {
+            color: #94A3B8;
+        }
+
+        .template-item .drag-handle svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
         }
 
         .template-item:hover {
@@ -1489,9 +1531,17 @@
             }
             
             taskList.innerHTML = activeTasks.map(task => `
-                <div class="task-item ${task.isTemplate ? 'template-task' : 'onetime-task'}" 
-                     data-id="${task.id}" 
-                     draggable="true">
+                <div class="task-item ${task.isTemplate ? 'template-task' : 'onetime-task'}" data-id="${task.id}">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="9" cy="5" r="1.5"/>
+                            <circle cx="9" cy="12" r="1.5"/>
+                            <circle cx="9" cy="19" r="1.5"/>
+                            <circle cx="15" cy="5" r="1.5"/>
+                            <circle cx="15" cy="12" r="1.5"/>
+                            <circle cx="15" cy="19" r="1.5"/>
+                        </svg>
+                    </div>
                     <input type="checkbox" class="task-checkbox" onchange="completeTask(${task.id})">
                     <span class="task-text">${escapeHtml(task.text)}</span>
                 </div>
@@ -1611,7 +1661,17 @@
             }
             
             taskList.innerHTML = tasks.map((task, index) => `
-                <div class="template-item" data-id="${task.id}" data-index="${index}" draggable="true">
+                <div class="template-item" data-id="${task.id}" data-index="${index}">
+                    <div class="drag-handle">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="9" cy="5" r="1.5"/>
+                            <circle cx="9" cy="12" r="1.5"/>
+                            <circle cx="9" cy="19" r="1.5"/>
+                            <circle cx="15" cy="5" r="1.5"/>
+                            <circle cx="15" cy="12" r="1.5"/>
+                            <circle cx="15" cy="19" r="1.5"/>
+                        </svg>
+                    </div>
                     <span class="template-item-text">${escapeHtml(task.text)}</span>
                     <div class="template-item-actions">
                         <button class="template-item-btn delete" onclick="deleteTemplateTask(${index})" title="Delete">
@@ -1768,6 +1828,12 @@
             const taskItems = document.querySelectorAll('#todayTaskList .task-item');
             
             taskItems.forEach((item, index) => {
+                const handle = item.querySelector('.drag-handle');
+                
+                handle.addEventListener('mousedown', () => {
+                    item.setAttribute('draggable', 'true');
+                });
+                
                 item.addEventListener('dragstart', (e) => {
                     draggedItem = item;
                     draggedIndex = index;
@@ -1776,6 +1842,7 @@
                 
                 item.addEventListener('dragend', (e) => {
                     item.classList.remove('dragging');
+                    item.setAttribute('draggable', 'false');
                     draggedItem = null;
                     draggedIndex = null;
                 });
@@ -1816,6 +1883,12 @@
             const templateItems = document.querySelectorAll('#templateTaskList .template-item');
             
             templateItems.forEach((item, index) => {
+                const handle = item.querySelector('.drag-handle');
+                
+                handle.addEventListener('mousedown', () => {
+                    item.setAttribute('draggable', 'true');
+                });
+                
                 item.addEventListener('dragstart', (e) => {
                     draggedItem = item;
                     draggedIndex = index;
@@ -1824,6 +1897,7 @@
                 
                 item.addEventListener('dragend', (e) => {
                     item.classList.remove('dragging');
+                    item.setAttribute('draggable', 'false');
                     draggedItem = null;
                     draggedIndex = null;
                 });
