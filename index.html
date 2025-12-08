@@ -321,6 +321,18 @@
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .header-mode:hover {
+            background: #FEE2E2;
+            transform: translateY(-1px);
+        }
+
+        .header-mode:active {
+            transform: translateY(0);
         }
 
         .header-mode.weekend {
@@ -911,6 +923,73 @@
             background: #A02838;
         }
 
+        /* ==================== TEMPLATE SELECTOR ==================== */
+        .template-selector-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .template-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: #F8F9FA;
+            border: 2px solid #E9ECEF;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-option:hover {
+            background: #F1F3F5;
+            border-color: #DEE2E6;
+        }
+
+        .template-option.selected {
+            background: #FEF2F2;
+            border-color: #BF3143;
+        }
+
+        .template-option-radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #CED4DA;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s;
+        }
+
+        .template-option.selected .template-option-radio {
+            border-color: #BF3143;
+        }
+
+        .template-option.selected .template-option-radio::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background: #BF3143;
+            border-radius: 50%;
+        }
+
+        .template-option-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .template-option.selected .template-option-label {
+            color: #BF3143;
+            font-weight: 600;
+        }
+
         /* ==================== CONFETTI ==================== */
         @keyframes confetti-fall {
             to {
@@ -1017,13 +1096,16 @@
             <div class="header">
                 <div class="header-title">Today's Tiny Wins</div>
                 <div class="header-date" id="todayDate"></div>
-                <div class="header-mode" id="todayMode">
+                <button class="header-mode" id="todayMode" onclick="showTemplateSelectorModal()">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 6v6l4 2"/>
                     </svg>
                     <span id="todayModeText">Weekday</span>
-                </div>
+                    <svg viewBox="0 0 20 20" width="12" height="12" fill="currentColor" style="margin-left: 4px;">
+                        <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
+                    </svg>
+                </button>
             </div>
 
             <div class="progress-section">
@@ -1167,6 +1249,26 @@
         </div>
     </div>
 
+    <div class="modal-overlay hidden" id="templateSelectorModal">
+        <div class="modal">
+            <div class="modal-title">Choose Today's Template</div>
+            <div class="template-selector-options">
+                <div class="template-option" data-mode="weekday" onclick="selectTodayTemplate('weekday')">
+                    <div class="template-option-radio"></div>
+                    <div class="template-option-label">Weekday</div>
+                </div>
+                <div class="template-option" data-mode="weekend" onclick="selectTodayTemplate('weekend')">
+                    <div class="template-option-radio"></div>
+                    <div class="template-option-label">Weekend</div>
+                </div>
+                <div class="template-option" data-mode="holiday" onclick="selectTodayTemplate('holiday')">
+                    <div class="template-option-radio"></div>
+                    <div class="template-option-label">Special Day</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ==================== STORAGE KEYS ====================
         const STORAGE_KEYS = {
@@ -1176,6 +1278,7 @@
             TODAY_TASKS: 'tinyWins_todayTasks',
             TODAY_MODE: 'tinyWins_todayMode',
             TODAY_DATE: 'tinyWins_todayDate',
+            TODAY_MODE_OVERRIDE: 'tinyWins_todayModeOverride',
             HISTORY: 'tinyWins_history'
         };
 
@@ -1298,7 +1401,25 @@
             
             // Load saved date/mode, but will be verified/updated by checkDateChange()
             state.todayDate = localStorage.getItem(STORAGE_KEYS.TODAY_DATE) || getTodayString();
-            state.todayMode = localStorage.getItem(STORAGE_KEYS.TODAY_MODE) || getDayMode();
+            
+            // Check for manual template override for today
+            const savedOverride = localStorage.getItem(STORAGE_KEYS.TODAY_MODE_OVERRIDE);
+            if (savedOverride) {
+                try {
+                    const override = JSON.parse(savedOverride);
+                    // Use override if it's for today's date
+                    if (override.date === getTodayString()) {
+                        state.todayMode = override.mode;
+                    } else {
+                        // Override is for a different date, use auto-detected mode
+                        state.todayMode = getDayMode();
+                    }
+                } catch (e) {
+                    state.todayMode = getDayMode();
+                }
+            } else {
+                state.todayMode = localStorage.getItem(STORAGE_KEYS.TODAY_MODE) || getDayMode();
+            }
             
             const savedHistory = localStorage.getItem(STORAGE_KEYS.HISTORY);
             if (savedHistory) {
@@ -1423,8 +1544,24 @@
             const today = getTodayString();
             const currentMode = getDayMode();
             
-            // Update mode if it's incorrect, even if date hasn't changed
-            if (state.todayMode !== currentMode && state.todayDate === today) {
+            // Check if there's a manual override for today
+            const savedOverride = localStorage.getItem(STORAGE_KEYS.TODAY_MODE_OVERRIDE);
+            let hasValidOverride = false;
+            
+            if (savedOverride) {
+                try {
+                    const override = JSON.parse(savedOverride);
+                    hasValidOverride = override.date === today;
+                } catch (e) {
+                    // Invalid override, ignore
+                }
+            }
+            
+            // Only auto-update mode if:
+            // 1. Date hasn't changed AND
+            // 2. There's no valid override for today AND
+            // 3. Current mode doesn't match auto-detected mode
+            if (state.todayDate === today && !hasValidOverride && state.todayMode !== currentMode) {
                 state.todayMode = currentMode;
                 localStorage.setItem(STORAGE_KEYS.TODAY_MODE, state.todayMode);
             }
@@ -1458,7 +1595,28 @@
                 }
                 
                 state.todayDate = today;
-                state.todayMode = currentMode;
+                
+                // Check if there's an override for the new date
+                const newDateOverride = localStorage.getItem(STORAGE_KEYS.TODAY_MODE_OVERRIDE);
+                let useOverrideForNewDate = false;
+                
+                if (newDateOverride) {
+                    try {
+                        const override = JSON.parse(newDateOverride);
+                        if (override.date === today) {
+                            state.todayMode = override.mode;
+                            useOverrideForNewDate = true;
+                        }
+                    } catch (e) {
+                        // Invalid override, use auto mode
+                    }
+                }
+                
+                // If no override for new date, use auto-detected mode
+                if (!useOverrideForNewDate) {
+                    state.todayMode = currentMode;
+                }
+                
                 loadTasksForDayMode();
                 
                 // Add carried over tasks
@@ -1875,6 +2033,50 @@
         function confirmModal() {
             if (modalCallback) modalCallback();
             closeModal();
+        }
+
+        // ==================== TEMPLATE SELECTOR ====================
+        function showTemplateSelectorModal() {
+            const modal = document.getElementById('templateSelectorModal');
+            
+            // Update selected state
+            document.querySelectorAll('.template-option').forEach(option => {
+                const mode = option.dataset.mode;
+                option.classList.toggle('selected', mode === state.todayMode);
+            });
+            
+            modal.classList.remove('hidden');
+            
+            // Close on backdrop click
+            modal.addEventListener('click', function closeOnBackdrop(e) {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    modal.removeEventListener('click', closeOnBackdrop);
+                }
+            });
+        }
+
+        function selectTodayTemplate(mode) {
+            // Update state
+            state.todayMode = mode;
+            
+            // Save override for today's date
+            const override = {
+                date: getTodayString(),
+                mode: mode
+            };
+            localStorage.setItem(STORAGE_KEYS.TODAY_MODE_OVERRIDE, JSON.stringify(override));
+            localStorage.setItem(STORAGE_KEYS.TODAY_MODE, mode);
+            
+            // Reload tasks from the selected template
+            loadTasksForDayMode();
+            saveTodayTasks();
+            
+            // Update the UI
+            loadTodayView();
+            
+            // Close modal
+            document.getElementById('templateSelectorModal').classList.add('hidden');
         }
 
         // ==================== UTILITIES ====================
