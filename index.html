@@ -395,6 +395,23 @@
             margin-bottom: 16px;
         }
 
+        .clear-all-btn {
+            padding: 6px 12px;
+            background: #F1F5F9;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            color: #64748B;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-all-btn:hover {
+            background: #FDF7F7;
+            border-color: #EBDCDC;
+            color: #BF3143;
+        }
+
         .section-title {
             font-size: 18px;
             font-weight: 700;
@@ -457,9 +474,8 @@
         }
 
         .task-item.onetime-task {
-            background: #FEF7ED;
-            border-color: #FED7AA;
-            border-left: 4px solid #F59E0B;
+            background: #F1F6FB;
+            border: 2px solid #C9D8E8;
         }
 
         .task-item.onetime-task::before {
@@ -724,8 +740,8 @@
         }
 
         .template-item-btn {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             border: none;
             background: #E2E8F0;
             border-radius: 8px;
@@ -735,6 +751,7 @@
             justify-content: center;
             color: #64748B;
             transition: all 0.2s;
+            margin-right: 12px;
         }
 
         .template-item-btn:hover {
@@ -742,13 +759,13 @@
         }
 
         .template-item-btn.delete:hover {
-            background: #FEE2E2;
+            background: #FDF7F7;
             color: #BF3143;
         }
 
         .template-item-btn svg {
-            width: 16px;
-            height: 16px;
+            width: 12px;
+            height: 12px;
             stroke: currentColor;
             stroke-width: 2;
             fill: none;
@@ -1067,6 +1084,7 @@
                         </svg>
                         Weekday Tasks
                     </div>
+                    <button class="clear-all-btn" onclick="clearAllTemplateTasks()">Clear All</button>
                 </div>
                 <div class="task-list" id="templateTaskList"></div>
             </div>
@@ -1659,12 +1677,12 @@
             
             taskList.innerHTML = tasks.map((task, index) => `
                 <div class="template-item" data-id="${task.id}" data-index="${index}">
-                    <span class="template-item-text">${escapeHtml(task.text)}</span>
                     <div class="template-item-actions">
                         <button class="template-item-btn delete" onclick="deleteTemplateTask(${index})" title="Delete">
                             <svg viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
+                    <span class="template-item-text">${escapeHtml(task.text)}</span>
                     <div class="drag-handle">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <circle cx="9" cy="5" r="1.5"/>
@@ -1705,6 +1723,25 @@
             state.templates[state.activeTemplateMode].splice(index, 1);
             saveTemplates();
             renderTemplateList();
+        }
+
+        function clearAllTemplateTasks() {
+            const mode = state.activeTemplateMode;
+            const modeNames = {
+                weekday: 'Weekday',
+                weekend: 'Weekend',
+                holiday: 'Holiday'
+            };
+            
+            showConfirmModal(
+                `Clear all ${modeNames[mode]} tasks?`,
+                `This will remove all tasks from your ${modeNames[mode]} template. This action cannot be undone.`,
+                () => {
+                    state.templates[mode] = [];
+                    saveTemplates();
+                    renderTemplateList();
+                }
+            );
         }
 
         // ==================== HISTORY VIEW ====================
