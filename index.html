@@ -1376,7 +1376,8 @@
                         <span>Reset This Browser</span>
                     </div>
                     <p style="margin: 0 0 12px 0; font-size: 13px; color: #64748b; line-height: 1.4;">Clear all tasks, templates, and history from this browser only. Will re-sync fresh data from other devices.</p>
-                    <button class="action-btn secondary" style="max-width: 160px; background: #ffffff; color: #475569; border: 1px solid #cbd5e1;" onclick="confirmResetBrowser()">Reset Browser</button>
+                    <button id="resetBrowserBtn" class="action-btn secondary" style="max-width: 160px; background: #ffffff; color: #475569; border: 1px solid #cbd5e1;" onclick="confirmResetBrowser()">Reset Browser</button>
+                    <div id="resetBrowserNote" style="margin-top: 8px; font-size: 12px; color: #94a3b8; min-height: 16px;"></div>
                 </div>
 
                 <!-- Delete All Data Everywhere Option -->
@@ -2639,6 +2640,7 @@
         syncCode = code.trim().toLowerCase();
         console.log('🔑 Sync code set:', syncCode);
         updateSyncCodeDisplay(syncCode);
+        updateDataManagementState();
         
         // Restart Firebase sync with new code
         if (unsubscribe) unsubscribe();
@@ -2762,6 +2764,7 @@
 
         // Update UI to show no sync
         updateSyncStatus('📱', 'Local only');
+        updateDataManagementState();
 
         // Reload the page to reset Firebase sync
         setTimeout(() => {
@@ -2781,6 +2784,11 @@
       }
 
       function resetBrowser() {
+        if (syncCode) {
+          showConfirmModal('Disconnect required', 'Please disconnect from Sync before resetting this browser.', () => {});
+          return;
+        }
+
         // Reset local state
         state.todayTasks = [];
         state.templates = { weekday: [], weekend: [], holiday: [] };
@@ -2835,6 +2843,22 @@
         if (statusEl) {
           statusEl.style.color = color || '#BF3143';
           statusEl.textContent = text || '';
+        }
+      }
+
+      function updateDataManagementState() {
+        const resetBtn = document.getElementById('resetBrowserBtn');
+        const resetNote = document.getElementById('resetBrowserNote');
+        const isConnected = !!syncCode;
+
+        if (resetBtn) {
+          resetBtn.disabled = isConnected;
+          resetBtn.style.opacity = isConnected ? '0.55' : '1';
+          resetBtn.style.cursor = isConnected ? 'not-allowed' : 'pointer';
+        }
+
+        if (resetNote) {
+          resetNote.textContent = isConnected ? 'Disconnect from Sync to enable reset.' : '';
         }
       }
 
@@ -2919,6 +2943,7 @@
             console.log('✅ User ID:', user.uid);
             console.log('🔑 Sync Code:', syncCode);
             updateSyncStatus('☁️', 'Syncing across devices');
+            updateDataManagementState();
             setupFirebaseSync();
           } else {
             auth.signInAnonymously()
