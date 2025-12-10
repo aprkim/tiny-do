@@ -1972,6 +1972,10 @@
             
             saveTodayTasks();
             updateProgressBar();
+            // Force immediate sync to Firestore so other devices see the change
+            if (typeof saveToFirestore === 'function') {
+                saveToFirestore();
+            }
         }
 
         function addTodayTask() {
