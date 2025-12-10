@@ -2409,7 +2409,12 @@
         }
 
         // ==================== START ====================
-        init();
+        // Wait for DOM to be ready before initializing
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 
     <!-- Firebase SDK (v8 - CDN) -->
@@ -2504,11 +2509,11 @@
             if (remoteData.history) state.history = remoteData.history;
             if (remoteData.todayMode) state.todayMode = remoteData.todayMode;
             
-            // Re-render UI
-            renderTasks();
-            renderTemplates();
-            renderHistory();
-            updateProgress();
+            // Re-render UI (only if functions exist)
+            if (typeof renderTasks === 'function') renderTasks();
+            if (typeof renderTemplates === 'function') renderTemplates();
+            if (typeof renderHistory === 'function') renderHistory();
+            if (typeof updateProgress === 'function') updateProgress();
             
             console.log('✅ Synced from another device');
           } else if (doc.exists && isFirstLoad) {
@@ -2523,10 +2528,10 @@
               if (remoteData.history) state.history = remoteData.history;
               if (remoteData.todayMode) state.todayMode = remoteData.todayMode;
               
-              renderTasks();
-              renderTemplates();
-              renderHistory();
-              updateProgress();
+              if (typeof renderTasks === 'function') renderTasks();
+              if (typeof renderTemplates === 'function') renderTemplates();
+              if (typeof renderHistory === 'function') renderHistory();
+              if (typeof updateProgress === 'function') updateProgress();
               
               console.log('✅ Loaded from Firestore');
             }
