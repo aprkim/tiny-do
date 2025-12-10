@@ -1779,7 +1779,14 @@
             document.querySelectorAll('.view').forEach(view => {
                 view.classList.remove('active');
             });
-            document.getElementById(`view-${tabName}`).classList.add('active');
+            
+            const targetView = document.getElementById(`view-${tabName}`);
+            if (targetView) {
+                targetView.classList.add('active');
+            } else {
+                console.error(`View not found: view-${tabName}`);
+                return;
+            }
             
             if (tabName === 'today') loadTodayView();
             else if (tabName === 'templates') loadTemplatesView();
@@ -2410,9 +2417,12 @@
 
         // ==================== START ====================
         // Wait for DOM to be ready before initializing
+        console.log('🚀 App loading... readyState:', document.readyState);
         if (document.readyState === 'loading') {
+            console.log('⏳ Waiting for DOM...');
             document.addEventListener('DOMContentLoaded', init);
         } else {
+            console.log('✅ DOM ready, initializing...');
             init();
         }
     </script>
