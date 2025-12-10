@@ -1328,6 +1328,7 @@
                         <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #333;">Cross-Device Sync</h3>
+                    <span id="syncPill" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid #e5e7eb; color: #6b7280; background: #f3f4f6; line-height: 1; margin-left: 8px;">OFF</span>
                 </div>
                 <p style="margin: 0 0 16px 0; font-size: 14px; color: #666; line-height: 1.5;">Use a sync code to access your data across devices and browsers.</p>
                 
@@ -2639,6 +2640,7 @@
         console.log('🔑 Sync code set:', syncCode);
         updateSyncCodeDisplay(syncCode);
         updateDataManagementState();
+        updateSyncPill(true);
         
         // Restart Firebase sync with new code
         if (unsubscribe) unsubscribe();
@@ -2769,6 +2771,7 @@
         // Update UI to show no sync
         updateSyncStatus('📱', 'Local only');
         updateDataManagementState();
+        updateSyncPill(false);
       }
 
       function confirmResetBrowser() {
@@ -2868,6 +2871,24 @@
         if (resetNote) {
           resetNote.textContent = isConnected ? 'Disconnect from Sync to enable reset.' : '';
         }
+
+        updateSyncPill(isConnected);
+      }
+
+      function updateSyncPill(isConnected) {
+        const pill = document.getElementById('syncPill');
+        if (!pill) return;
+        if (isConnected) {
+          pill.textContent = 'ON';
+          pill.style.background = '#E8F2FF';
+          pill.style.border = '1px solid #C5DBFF';
+          pill.style.color = '#1D4ED8';
+        } else {
+          pill.textContent = 'OFF';
+          pill.style.background = '#f3f4f6';
+          pill.style.border = '1px solid #e5e7eb';
+          pill.style.color = '#6b7280';
+        }
       }
 
       function showSyncCodeCard() {
@@ -2952,6 +2973,7 @@
             console.log('🔑 Sync Code:', syncCode);
             updateSyncStatus('☁️', 'Syncing across devices');
             updateDataManagementState();
+            updateSyncPill(!!syncCode);
             setupFirebaseSync();
           } else {
             auth.signInAnonymously()
