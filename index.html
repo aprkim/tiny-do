@@ -1347,15 +1347,37 @@
 
             <!-- Data Management Card -->
             <div style="margin-top: 16px; padding: 20px; background: white; border-radius: 16px; border: 1px solid #e5e7eb;">
-                <div style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; color: #333; margin-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; color: #333; margin-bottom: 16px;">
                     <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #BF3143;">
                         <path d="M3 6h18M9 6V4h6v2m-8 0v14a1 1 0 001 1h8a1 1 0 001-1V6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <path d="M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     <span>Data Management</span>
                 </div>
-                <p style="margin: 0 0 12px 0; font-size: 14px; color: #666; line-height: 1.5;">Remove all tasks, templates, and history from this browser.</p>
-                <button class="action-btn secondary" style="max-width: 200px; background: #f1f5f9; color: #6b7280; margin-bottom: 0;" onclick="confirmDeleteAll()">Delete All Data</button>
+
+                <!-- Disconnect from Sync Option -->
+                <div style="margin-bottom: 16px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 6px;">
+                        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #64748b;">
+                            <path d="M18 6L6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Disconnect from Sync</span>
+                    </div>
+                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #64748b; line-height: 1.4;">Stop syncing with other devices. This browser will use local storage only.</p>
+                    <button class="action-btn secondary" style="max-width: 160px; background: #e2e8f0; color: #475569; border: 1px solid #cbd5e1;" onclick="confirmDisconnectSync()">Disconnect Sync</button>
+                </div>
+
+                <!-- Delete All Data Everywhere Option -->
+                <div style="padding: 16px; background: #fef2f2; border-radius: 12px; border: 1px solid #fecaca;">
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #991b1b; margin-bottom: 6px;">
+                        <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; color: #dc2626;">
+                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Delete All Data Everywhere</span>
+                    </div>
+                    <p style="margin: 0 0 12px 0; font-size: 13px; color: #7f1d1d; line-height: 1.4;">Permanently remove all tasks, templates, and history from ALL synced devices.</p>
+                    <button class="action-btn secondary" style="max-width: 200px; background: #dc2626; color: white; border: 1px solid #b91c1c;" onclick="confirmDeleteAllEverywhere()">Delete Everything</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2687,7 +2709,7 @@
         });
       }
 
-      async function deleteAllData() {
+      async function deleteAllDataEverywhere() {
         // Reset local state
         state.todayTasks = [];
         state.templates = { weekday: [], weekend: [], holiday: [] };
@@ -2718,13 +2740,40 @@
         }
       }
 
-      function confirmDeleteAll() {
+      function disconnectFromSync() {
+        // Clear sync code from localStorage
+        localStorage.removeItem(STORAGE_KEYS.SYNC_CODE);
+
+        // Reset sync variables
+        syncCode = null;
+
+        // Update UI to show no sync
+        updateSyncStatus('📱', 'Local only');
+
+        // Reload the page to reset Firebase sync
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+
+      function confirmDisconnectSync() {
         showConfirmModal(
-          'Delete all data',
-          'This will remove tasks, templates, and history for this sync code. Continue?',
+          'Disconnect from sync',
+          'This device will stop syncing with other browsers. Your data will remain on other devices but this browser will use local storage only. Continue?',
+          () => {
+            disconnectFromSync();
+            setSyncStatus('Disconnected from sync', '#4A90E2');
+          }
+        );
+      }
+
+      function confirmDeleteAllEverywhere() {
+        showConfirmModal(
+          'Delete all data everywhere',
+          'This will permanently remove tasks, templates, and history from ALL synced devices. This cannot be undone. Continue?',
           async () => {
-            await deleteAllData();
-            setSyncStatus('All data deleted', '#BF3143');
+            await deleteAllDataEverywhere();
+            setSyncStatus('All data deleted everywhere', '#BF3143');
           }
         );
       }
