@@ -1183,7 +1183,10 @@
     <div id="view-today" class="view">
         <div class="container">
             <div class="header">
-                <div class="header-title">Today's Tiny Wins</div>
+                <div class="header-title">
+                    Today's Tiny Wins
+                    <span id="syncStatus" style="font-size: 14px; margin-left: 6px; opacity: 0.6; cursor: help;"></span>
+                </div>
                 <div class="header-date" id="todayDate"></div>
                 <button class="header-mode" id="todayMode" onclick="showTemplateSelectorModal()">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
@@ -2407,6 +2410,176 @@
 
         // ==================== START ====================
         init();
+    </script>
+
+    <!-- Firebase SDK (v8 - CDN) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <!-- Firebase Configuration and Sync Logic -->
+    <script>
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyBycFP3HfMF7tyshQixvwzoaAE3Df8Fz_8",
+        authDomain: "tiny-wins25.firebaseapp.com",
+        projectId: "tiny-wins25",
+        storageBucket: "tiny-wins25.firebasestorage.app",
+        messagingSenderId: "497477643272",
+        appId: "1:497477643272:web:9f8e43fbffd18003e5f5bd",
+        measurementId: "G-LN45C9MF6F"
+      };
+
+      // Initialize Firebase
+      let db, auth;
+      let firebaseReady = false;
+      let currentUserId = null;
+
+      try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        auth = firebase.auth();
+        
+        // Enable offline persistence
+        db.enablePersistence({ synchronizeTabs: true })
+          .catch((err) => {
+            if (err.code === 'failed-precondition') {
+              console.warn('⚠️ Persistence: Multiple tabs open');
+            } else if (err.code === 'unimplemented') {
+              console.warn('⚠️ Persistence not available');
+            }
+          });
+
+        console.log('✅ Firebase initialized');
+
+        // Auto sign-in anonymously
+        auth.onAuthStateChanged((user) => {
+          if (user) {
+            currentUserId = user.uid;
+            firebaseReady = true;
+            console.log('✅ User ID:', user.uid);
+            updateSyncStatus('☁️', 'Syncing across devices');
+            setupFirebaseSync();
+          } else {
+            auth.signInAnonymously()
+              .then(() => console.log('✅ Signed in anonymously'))
+              .catch((err) => {
+                console.error('❌ Auth failed:', err);
+                updateSyncStatus('⚠️', 'Sync unavailable');
+              });
+          }
+        });
+
+      } catch (error) {
+        console.error('❌ Firebase init failed:', error);
+        updateSyncStatus('', '');
+      }
+
+      // Update sync status indicator
+      function updateSyncStatus(icon, title) {
+        const statusEl = document.getElementById('syncStatus');
+        if (statusEl) {
+          statusEl.textContent = icon;
+          statusEl.title = title;
+        }
+      }
+
+      // Setup Firebase real-time sync
+      let unsubscribe = null;
+      let isFirstLoad = true;
+
+      function setupFirebaseSync() {
+        if (!firebaseReady || !currentUserId) return;
+
+        const userDoc = db.collection('tinyWins').doc(currentUserId);
+
+        // Listen for remote changes
+        unsubscribe = userDoc.onSnapshot((doc) => {
+          if (doc.exists && !isFirstLoad) {
+            const remoteData = doc.data();
+            
+            // Update state from Firestore
+            if (remoteData.todayTasks) state.todayTasks = remoteData.todayTasks;
+            if (remoteData.templates) state.templates = remoteData.templates;
+            if (remoteData.history) state.history = remoteData.history;
+            if (remoteData.todayMode) state.todayMode = remoteData.todayMode;
+            
+            // Re-render UI
+            renderTasks();
+            renderTemplates();
+            renderHistory();
+            updateProgress();
+            
+            console.log('✅ Synced from another device');
+          } else if (doc.exists && isFirstLoad) {
+            // First load - pull from Firestore
+            const remoteData = doc.data();
+            const localHasData = state.todayTasks.length > 0 || state.templates.length > 0;
+            
+            if (!localHasData && remoteData.todayTasks) {
+              // No local data, use remote
+              if (remoteData.todayTasks) state.todayTasks = remoteData.todayTasks;
+              if (remoteData.templates) state.templates = remoteData.templates;
+              if (remoteData.history) state.history = remoteData.history;
+              if (remoteData.todayMode) state.todayMode = remoteData.todayMode;
+              
+              renderTasks();
+              renderTemplates();
+              renderHistory();
+              updateProgress();
+              
+              console.log('✅ Loaded from Firestore');
+            }
+          } else if (!doc.exists && isFirstLoad) {
+            // No remote data yet, push local data
+            saveToFirestore();
+            console.log('✅ Initial sync: Local → Firestore');
+          }
+          
+          isFirstLoad = false;
+        }, (error) => {
+          console.error('❌ Sync error:', error);
+        });
+      }
+
+      // Save to Firestore (called after any state change)
+      async function saveToFirestore() {
+        if (!firebaseReady || !currentUserId) return;
+
+        try {
+          await db.collection('tinyWins').doc(currentUserId).set({
+            todayTasks: state.todayTasks,
+            templates: state.templates,
+            history: state.history,
+            todayMode: state.todayMode,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          }, { merge: true });
+          
+          console.log('✅ Saved to Firestore');
+        } catch (error) {
+          console.error('❌ Save failed:', error);
+        }
+      }
+
+      // Hook into existing save functions
+      const originalSaveTodayTasks = saveTodayTasks;
+      const originalSaveTemplates = saveTemplates;
+      const originalSaveHistory = saveHistory;
+
+      saveTodayTasks = function() {
+        originalSaveTodayTasks();
+        saveToFirestore();
+      };
+
+      saveTemplates = function() {
+        originalSaveTemplates();
+        saveToFirestore();
+      };
+
+      saveHistory = function() {
+        originalSaveHistory();
+        saveToFirestore();
+      };
     </script>
 </body>
 </html>
