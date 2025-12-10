@@ -606,7 +606,7 @@
             border: none;
             border-radius: 12px;
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 550;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -1163,22 +1163,22 @@
                 <div class="onboarding-logo">
                     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5 3v18l7-5 7 5V3H5z"/>
-                    </svg>
-                </div>
+                </svg>
+            </div>
                 <h1 class="onboarding-title">Tiny Wins</h1>
                 <p class="onboarding-subtitle">Tiny steps. Real progress.</p>
             </div>
-
+            
             <h2 class="onboarding-section-title">Choose a preset or create your own.</h2>
-
+            
             <div class="template-cards" id="templateCards">
                 <!-- Template cards will be inserted here -->
             </div>
-
+            
             <button class="onboarding-btn" id="startBtn" disabled>Get Started</button>
-        </div>
-    </div>
-
+            </div>
+            </div>
+            
     <!-- ==================== TODAY VIEW ==================== -->
     <div id="view-today" class="view">
         <div class="container">
@@ -1186,7 +1186,7 @@
                 <div class="header-title">
                     Today's Tiny Wins
                     <span id="syncStatus" style="font-size: 16px; margin-left: 8px; opacity: 1; cursor: pointer; color: #4A90E2;" onclick="showSyncCodeModal()" title="Click to view/manage sync code"></span>
-                </div>
+        </div>
                 <div class="header-date" id="todayDate"></div>
                 <button class="header-mode" id="todayMode" onclick="showTemplateSelectorModal()">
                     <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
@@ -1198,25 +1198,25 @@
                         <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
                     </svg>
                 </button>
-            </div>
+    </div>
 
             <div class="progress-section">
                 <div class="progress-label" id="progressLabel">0 of 0 tasks completed</div>
                 <div class="progress-bar-container">
                     <div class="progress-bar" id="progressBar"></div>
                     <div class="progress-percentage" id="progressPercentage">0%</div>
-                </div>
             </div>
+        </div>
 
             <div class="task-section">
                 <div class="section-header">
                     <div class="section-title">
                         <svg viewBox="0 0 24 24">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
-                        </svg>
-                        Tasks
-                    </div>
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                    </svg>
+                    Tasks
                 </div>
+            </div>
                 <div class="task-list" id="todayTaskList"></div>
             </div>
 
@@ -1261,7 +1261,7 @@
                     <div class="section-title" id="templateSectionTitle">
                         <svg viewBox="0 0 24 24">
                             <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-                        </svg>
+                </svg>
                         Weekday Tasks
                     </div>
                     <button class="clear-all-btn" id="clearAllTemplateBtn" onclick="clearAllTemplateTasks()">Clear All</button>
@@ -1273,9 +1273,9 @@
                 <div class="section-title" style="margin-bottom: 12px;">
                     <svg viewBox="0 0 24 24" width="20" height="20" stroke="#64748B" stroke-width="2" fill="none">
                         <path d="M12 4v16m8-8H4"/>
-                    </svg>
+                        </svg>
                     Add to Template
-                </div>
+                    </div>
                 <div class="add-task-row">
                     <input type="text" class="add-task-input" id="templateTaskInput" placeholder="Add a recurring task..." maxlength="200">
                     <button class="add-task-btn" id="templateAddBtn" disabled>Add</button>
@@ -1305,8 +1305,8 @@
                 Clear History
             </button>
 
+            </div>
         </div>
-    </div>
 
     <!-- ==================== SETTINGS VIEW ==================== -->
     <div id="view-settings" class="view">
@@ -1314,7 +1314,7 @@
             <div class="header">
                 <div class="header-title">Settings</div>
                 <div class="header-date">Manage sync and preferences</div>
-            </div>
+    </div>
 
             <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 16px;">
                 <div style="display: flex; align-items: center; gap: 10px; margin: 0 0 8px 0;">
@@ -1334,8 +1334,8 @@
                 </div>
 
                 <div style="padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 12px; background: #f9fafb; display: flex; align-items: center; gap: 15px; min-height: 56px; margin-top: 12px;">
-                    <input id="enterSyncCodeInput" type="text" placeholder="Enter sync code from another device" style="flex: 0 0 75%; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; min-width: 0; background: white;">
-                    <button onclick="submitSyncCode()" style="flex: 0 0 20%; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #eef2f7; color: #5b6474; cursor: pointer; transition: background 0.2s; min-width: 0; height: 100%; display: flex; align-items: center; justify-content: center;">Link</button>
+                    <input id="enterSyncCodeInput" type="text" placeholder="Enter sync code from another device or browser" style="flex: 0 0 75%; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; min-width: 0; background: white; outline: none; box-shadow: none;">
+                    <button onclick="submitSyncCode()" style="flex: 0 0 20%; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #eef2f7; color: #5b6474; cursor: pointer; transition: background 0.2s; min-width: 0; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1;">Link</button>
                 </div>
             </div>
         </div>
@@ -2155,18 +2155,18 @@
                             <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
                         </svg>
                     </div>
-                    <div class="history-stats">
+                            <div class="history-stats">
                         <span class="history-completion">${entry.tasksCompleted} / ${entry.tasksTotal} completed</span>
                         <span class="history-percentage">${entry.percentage}%</span>
-                    </div>
+                            </div>
                     <div class="history-tasks-list">
                         ${tasksHtml}
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
             }).join('');
         }
-        
+
         function toggleHistoryItem(index) {
             const historyItem = document.querySelector(`.history-item[data-index="${index}"]`);
             if (!historyItem) return;
@@ -2494,10 +2494,10 @@
                     } catch (e) {}
                 }
                 
-                localStorage.removeItem('dailyChecklistData');
-                localStorage.removeItem('dailyChecklistHistory');
-                localStorage.removeItem('userDefaultTasks');
-                localStorage.removeItem('setupComplete');
+                    localStorage.removeItem('dailyChecklistData');
+                    localStorage.removeItem('dailyChecklistHistory');
+                    localStorage.removeItem('userDefaultTasks');
+                    localStorage.removeItem('setupComplete');
                 localStorage.removeItem('activeDate');
                 
                 // Mark setup as complete if migrating old data
@@ -2565,7 +2565,7 @@
           code = generateSyncCode();
           localStorage.setItem('tinywins_sync_code', code);
           console.log('🔑 Generated new sync code:', code);
-        } else {
+            } else {
           console.log('🔑 Using existing sync code:', code);
         }
         updateSyncCodeDisplay(code);
@@ -2684,8 +2684,8 @@
         if (!input) return;
         const code = input.value.trim().toLowerCase();
         if (setSyncCode(code)) {
-          openSyncModal(code, 'Sync code set. Reloading to sync data...');
-          setTimeout(() => location.reload(), 600);
+          setSyncStatus('Linked. Reloading...', '#BF3143');
+          setTimeout(() => location.reload(), 300);
         }
       }
 
