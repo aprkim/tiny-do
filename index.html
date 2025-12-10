@@ -1423,6 +1423,18 @@
                     "Spaced repetition session",
                     "Write mini-reflection"
                 ]
+            },
+            weekend: {
+                name: "Weekend Reset",
+                description: "Recharge and prepare",
+                icon: "weekend",
+                tasks: [
+                    "Sleep in a bit",
+                    "Light exercise or walk",
+                    "Meal prep for the week",
+                    "Clean and organize",
+                    "Do something fun"
+                ]
             }
         };
 
@@ -1585,15 +1597,22 @@
                 };
             } else {
                 const template = SAMPLE_TEMPLATES[state.selectedTemplate];
-                state.templates = {
-                    weekday: template.tasks.map((text, i) => ({ id: Date.now() + i, text })),
-                    weekend: SAMPLE_TEMPLATES.weekend.tasks.map((text, i) => ({ id: Date.now() + 100 + i, text })),
-                    holiday: [
-                        { id: Date.now() + 200, text: "Relax and recharge" },
-                        { id: Date.now() + 201, text: "Do something you enjoy" },
-                        { id: Date.now() + 202, text: "Connect with loved ones" }
-                    ]
-                };
+                if (!template) {
+                    console.error('Template not found:', state.selectedTemplate);
+                    state.selectedTemplate = 'blank';
+                    state.templates = { weekday: [], weekend: [], holiday: [] };
+                } else {
+                    const weekendTemplate = SAMPLE_TEMPLATES.weekend || { tasks: [] };
+                    state.templates = {
+                        weekday: template.tasks.map((text, i) => ({ id: Date.now() + i, text })),
+                        weekend: weekendTemplate.tasks.map((text, i) => ({ id: Date.now() + 100 + i, text })),
+                        holiday: [
+                            { id: Date.now() + 200, text: "Relax and recharge" },
+                            { id: Date.now() + 201, text: "Do something you enjoy" },
+                            { id: Date.now() + 202, text: "Connect with loved ones" }
+                        ]
+                    };
+                }
             }
             
             state.setupComplete = true;
