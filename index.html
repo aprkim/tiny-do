@@ -1325,11 +1325,12 @@
                 </div>
                 <p style="margin: 0 0 16px 0; font-size: 14px; color: #666; line-height: 1.5;">Use a sync code to access your data on multiple devices (phone, tablet, computer).</p>
                 
-                <div id="syncCodeCard" style="padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 12px; background: #f9fafb; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; min-height: 56px;">
+                <button class="action-btn secondary" onclick="showSyncCodeCard()" style="margin-bottom: 12px;">Show My Sync Code</button>
+                <div id="syncCodeCard" style="padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 12px; background: #f9fafb; margin-bottom: 12px; display: none; align-items: center; gap: 15px; min-height: 56px;">
                     <div style="flex: 0 0 75%; min-width: 0;">
                         <div id="syncCodeText" style="font-family: monospace; color: #111827; word-break: break-all; font-size: 15px; line-height: 1.4;">—</div>
                     </div>
-                    <button data-sync-copy="card" style="flex: 0 0 20%; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #BF3143; color: #fff; cursor: pointer; transition: background 0.2s; min-width: 0;" onclick="copySyncCode()">Copy</button>
+                    <button data-sync-copy="card" style="flex: 0 0 20%; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #BF3143; color: #fff; cursor: pointer; transition: background 0.2s; min-width: 0; display: flex; align-items: center; justify-content: center;" onclick="copySyncCode()">Copy</button>
                 </div>
 
                 <div style="padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 12px; background: #f9fafb; display: flex; align-items: center; gap: 15px; min-height: 56px; margin-top: 12px;">
@@ -1402,7 +1403,7 @@
                 <div style="flex: 7 1 0;">
                     <div id="syncModalCode" style="font-family: monospace; font-size: 15px; color: #111827; word-break: break-all;">—</div>
                 </div>
-                <button data-sync-copy="modal" style="flex: 2.4 1 0; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #BF3143; color: #fff; cursor: pointer; transition: background 0.2s;" onclick="copySyncCode()">Copy</button>
+                <button data-sync-copy="modal" style="flex: 2.4 1 0; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #BF3143; color: #fff; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center;" onclick="copySyncCode()">Copy</button>
             </div>
             <div id="syncModalStatus" style="font-size: 13px; color: #BF3143; min-height: 18px; margin-bottom: 4px;"></div>
         </div>
@@ -2599,13 +2600,47 @@
       // Copy sync code
       async function copySyncCode() {
         const code = getSyncCode();
+        let success = false;
         try {
-          await navigator.clipboard.writeText(code);
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(code);
+            success = true;
+          }
+        } catch (e) {
+          success = false;
+        }
+
+        // Fallback for mobile/Safari if clipboard API fails
+        if (!success) {
+          success = fallbackCopyText(code);
+        }
+
+        if (success) {
           setSyncStatus('Copied', '#BF3143');
           setCopyButtonsState('Copied', '#333', '#eef2f7', '#e5e7eb');
           setTimeout(() => setCopyButtonsState('Copy', '#fff', '#BF3143', 'none'), 1200);
-        } catch (e) {
+        } else {
           setSyncStatus('Copy failed. Please copy manually.', '#EF4444');
+          setCopyButtonsState('Copy', '#fff', '#BF3143', 'none');
+        }
+      }
+
+      // Fallback copy for browsers without navigator.clipboard (mobile/Safari)
+      function fallbackCopyText(text) {
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'absolute';
+          textarea.style.left = '-9999px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          textarea.setSelectionRange(0, text.length);
+          const ok = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          return ok;
+        } catch (err) {
+          return false;
         }
       }
 
@@ -2625,6 +2660,15 @@
           statusEl.style.color = color || '#BF3143';
           statusEl.textContent = text || '';
         }
+      }
+
+      function showSyncCodeCard() {
+        const card = document.getElementById('syncCodeCard');
+        const textEl = document.getElementById('syncCodeText');
+        const code = getSyncCode();
+        if (textEl) textEl.textContent = code || '—';
+        if (card) card.style.display = 'flex';
+        setCopyButtonsState('Copy', '#fff', '#BF3143', 'none');
       }
 
       // Generate a fresh sync code
