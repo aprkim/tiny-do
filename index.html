@@ -1335,7 +1335,7 @@
 
                 <div style="padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 12px; background: #f9fafb; display: flex; align-items: center; gap: 15px; min-height: 56px; margin-top: 12px;">
                     <input id="enterSyncCodeInput" type="text" placeholder="Enter sync code from another device or browser" style="flex: 0 0 75%; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; min-width: 0; background: white; outline: none; box-shadow: none;">
-                    <button onclick="submitSyncCode()" style="flex: 0 0 20%; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #eef2f7; color: #5b6474; cursor: pointer; transition: background 0.2s; min-width: 0; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1;">Link</button>
+                    <button data-sync-link="card" onclick="submitSyncCode()" style="flex: 0 0 20%; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #eef2f7; color: #5b6474; cursor: pointer; transition: background 0.2s; min-width: 0; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1;">Link</button>
                 </div>
             </div>
         </div>
@@ -2654,6 +2654,16 @@
         });
       }
 
+      function setLinkButtonsState(text, color, bg, border) {
+        const buttons = document.querySelectorAll('[data-sync-link]');
+        buttons.forEach(btn => {
+          if (text !== undefined) btn.textContent = text;
+          if (color !== undefined) btn.style.color = color;
+          if (bg !== undefined) btn.style.background = bg;
+          if (border !== undefined) btn.style.border = border;
+        });
+      }
+
       function setSyncStatus(text, color) {
         const statusEl = document.getElementById('syncModalStatus');
         if (statusEl) {
@@ -2685,7 +2695,10 @@
         const code = input.value.trim().toLowerCase();
         if (setSyncCode(code)) {
           setSyncStatus('Linked. Reloading...', '#BF3143');
+          setLinkButtonsState('Linked', '#fff', '#BF3143', 'none');
           setTimeout(() => location.reload(), 300);
+        } else {
+          setLinkButtonsState('Link', '#5b6474', '#eef2f7', 'none');
         }
       }
 
