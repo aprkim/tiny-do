@@ -1577,6 +1577,8 @@
             },
             history: []
         };
+        // Track whether date rollover logic has already run this session
+        let hasRunDateCheckThisSession = false;
 
         // ==================== ICONS ====================
         const ICONS = {
@@ -1769,6 +1771,8 @@
         function checkDateChange() {
             const today = getTodayString();
             const currentMode = getDayMode();
+            const isFirstCheckThisSession = !hasRunDateCheckThisSession;
+            hasRunDateCheckThisSession = true;
             
             // Check if there's a manual override for today
             const savedOverride = localStorage.getItem(STORAGE_KEYS.TODAY_MODE_OVERRIDE);
@@ -1793,6 +1797,12 @@
             }
             
             if (state.todayDate !== today) {
+                // When the app stays open across midnight, keep the current template/day.
+                // Only roll to a new date on the first check after a fresh load.
+                if (!isFirstCheckThisSession) {
+                    return;
+                }
+                
                 // Get uncompleted one-time tasks to carry over
                 const carryOverTasks = state.todayTasks
                     .filter(t => !t.isTemplate && !t.completed)
