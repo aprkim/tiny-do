@@ -2,7 +2,7 @@
 
 ## 🎯 What This Does
 
-Adds **automatic cross-device sync** to your Tiny Wins app:
+Adds **automatic cross-device sync** to your Tiny Do app:
 - ✅ Auto-sync across all devices (phone, tablet, computer)
 - ✅ No login required (anonymous authentication)
 - ✅ Works offline, syncs when back online
@@ -52,7 +52,7 @@ firebase init
 ### Step 5: Test It!
 
 1. Open your app on this device
-2. Look for the **☁️** icon next to "Today's Tiny Wins"
+2. Look for the **☁️** icon next to "Today's Tiny Do"
 3. Add a task
 4. Open the app on another device (or different browser)
 5. Your task should appear automatically! 🎉

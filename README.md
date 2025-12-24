@@ -1,12 +1,12 @@
-# Tiny Wins 🏆
+# Tiny Do 🏆
 
 **Small steps. Big impact.** Your daily checklist for building better habits.
 
-![Tiny Wins](og-image.png)
+![Tiny Do](og-image.png)
 
 ## 🌟 Overview
 
-Tiny Wins is a minimalist daily task management app designed to help you build consistent habits through small, achievable daily goals. Unlike traditional to-do apps, Tiny Wins features customizable **template-based routines** for weekdays, weekends, and special days, plus support for **one-time tasks**.
+Tiny Do is a minimalist daily task management app designed to help you build consistent habits through small, achievable daily goals. Unlike traditional to-do apps, Tiny Do features customizable **template-based routines** for weekdays, weekends, and special days, plus support for **one-time tasks**.
 
 ## ✨ Features
 
@@ -59,7 +59,7 @@ Tiny Wins is a minimalist daily task management app designed to help you build c
 ## 🚀 Getting Started
 
 ### Option 1: Use Online
-Visit: [https://aprkim.github.io/tiny-wins/](https://aprkim.github.io/tiny-wins/)
+Visit: [https://do.tinywins.space/](https://do.tinywins.space/)
 
 ### Option 2: Run Locally
 1. Clone the repository:
@@ -69,7 +69,7 @@ Visit: [https://aprkim.github.io/tiny-wins/](https://aprkim.github.io/tiny-wins/
 2. Open `index.html` in your browser
 
 ### Add to Home Screen (Mobile)
-For the best experience, add Tiny Wins to your phone's home screen:
+For the best experience, add Tiny Do to your phone's home screen:
 - **iOS**: Tap Share → Add to Home Screen
 - **Android**: Tap Menu → Add to Home Screen
 
@@ -120,7 +120,7 @@ All data is stored locally in your browser using these keys:
 
 ## 🎯 Philosophy
 
-Tiny Wins is built on the belief that **consistent small actions lead to significant results**. Instead of overwhelming yourself with ambitious goals, focus on achievable daily wins that compound over time.
+Tiny Do is built on the belief that **consistent small actions lead to significant results**. Instead of overwhelming yourself with ambitious goals, focus on achievable daily wins that compound over time.
 
 > "A journey of a thousand miles begins with a single step." — Lao Tzu
 
@@ -146,4 +146,4 @@ Created by April Kim • 2025
 
 ---
 
-**Start your tiny wins journey today!** 🚀
+**Start your tiny do journey today!** 🚀

@@ -56,7 +56,7 @@
   
   <!-- Title (adjusted for 120px space) -->
   <text x="600" y="343" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="800" fill="#333333" text-anchor="middle">
-    Tiny Wins
+    Tiny Do
   </text>
   
   <!-- Tagline -->
