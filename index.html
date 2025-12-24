@@ -2359,6 +2359,17 @@
         function renderHistoryList() {
             const historyList = document.getElementById('historyList');
             
+            // Capture expanded states before re-rendering
+            const expandedIndices = new Set();
+            if (historyList) {
+                historyList.querySelectorAll('.history-item').forEach(item => {
+                    const tasksList = item.querySelector('.history-tasks-list');
+                    if (tasksList && tasksList.style.display === 'block') {
+                        expandedIndices.add(item.dataset.index);
+                    }
+                });
+            }
+
             if (state.history.length === 0) {
                 historyList.innerHTML = '<div class="empty-message" style="background: white; border-radius: 16px; margin-bottom: 20px;">No history yet. Complete some tasks!</div>';
                 return;
@@ -2379,14 +2390,16 @@
                     : '<div class="history-task empty-history-task">Task details not available for this day.</div>';
                 
                 const isToday = entry.date === getTodayString();
+                const isExpanded = expandedIndices.has(String(index));
+                
                 return `
-                <div class="history-item ${isToday ? 'today' : ''}" data-index="${index}" onclick="toggleHistoryItem(${index})">
+                <div class="history-item ${isToday ? 'today' : ''} ${isExpanded ? 'expanded' : ''}" data-index="${index}" onclick="toggleHistoryItem(${index})">
                     <div class="history-item-header">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <span class="history-date">${formatDateShort(entry.date)}</span>
                             <span class="history-mode ${entry.mode}">${formatModeName(entry.mode)}</span>
                         </div>
-                        <svg class="history-chevron" viewBox="0 0 20 20" width="16" height="16" fill="currentColor">
+                        <svg class="history-chevron" viewBox="0 0 20 20" width="16" height="16" fill="currentColor" style="transform: ${isExpanded ? 'rotate(180deg)' : 'rotate(0deg)'}">
                             <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"/>
                         </svg>
                     </div>
@@ -2394,7 +2407,7 @@
                         <span class="history-completion">${entry.tasksCompleted} / ${entry.tasksTotal} completed</span>
                         <span class="history-percentage">${entry.percentage}%</span>
                             </div>
-                    <div class="history-tasks-list">
+                    <div class="history-tasks-list" style="display: ${isExpanded ? 'block' : 'none'}">
                         ${tasksHtml}
                         </div>
                     </div>
