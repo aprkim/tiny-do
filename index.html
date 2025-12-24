@@ -1931,8 +1931,9 @@
                 
                 // Save previous day to history
                 if (state.todayTasks.length > 0) {
-                    const completed = state.todayTasks.filter(t => t.completed).length;
-                    const total = state.todayTasks.length;
+                    const templateTasks = state.todayTasks.filter(t => t.isTemplate);
+                    const completed = templateTasks.filter(t => t.completed).length;
+                    const total = templateTasks.length;
                     
                     state.history.unshift({
                         date: state.todayDate,
@@ -2226,8 +2227,9 @@
         }
 
         function updateProgressBar() {
-            const total = state.todayTasks.length;
-            const completed = state.todayTasks.filter(t => t.completed).length;
+            const templateTasks = state.todayTasks.filter(t => t.isTemplate);
+            const total = templateTasks.length;
+            const completed = templateTasks.filter(t => t.completed).length;
             const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
             
             document.getElementById('progressLabel').textContent = `${completed} of ${total} tasks completed (${percentage}%)`;
@@ -2425,9 +2427,10 @@
             task.completed = !task.completed;
             
             // Recalculate stats
-            const completedCount = entry.tasks.filter(t => t.completed).length;
+            const templateTasks = entry.tasks.filter(t => t.isTemplate);
+            const completedCount = templateTasks.filter(t => t.completed).length;
             entry.tasksCompleted = completedCount;
-            const totalTasks = entry.tasks.length;
+            const totalTasks = templateTasks.length;
             entry.tasksTotal = totalTasks;
             entry.percentage = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
             
@@ -2506,8 +2509,9 @@
 
         // ==================== CONFETTI ====================
         function checkForConfetti() {
-            const total = state.todayTasks.length;
-            const completed = state.todayTasks.filter(t => t.completed).length;
+            const templateTasks = state.todayTasks.filter(t => t.isTemplate);
+            const total = templateTasks.length;
+            const completed = templateTasks.filter(t => t.completed).length;
             
             if (total > 0 && completed === total) {
                 showConfetti();
@@ -2580,6 +2584,9 @@
         }
 
         function selectTodayTemplate(mode) {
+            // Preserve one-time tasks (both completed and uncompleted)
+            const oneTimeTasks = state.todayTasks.filter(t => !t.isTemplate);
+
             // Update state
             state.todayMode = mode;
             
@@ -2593,6 +2600,9 @@
             
             // Reload tasks from the selected template
             loadTasksForDayMode();
+            
+            // Restore one-time tasks
+            state.todayTasks = [...state.todayTasks, ...oneTimeTasks];
             saveTodayTasks();
             
             // Update the UI
