@@ -3494,7 +3494,14 @@
               return;
             }
 
-            // Always apply remote on first load; subsequent loads also update
+            // On first load, skip if this is coming from cache (not server)
+            if (isFirstLoad && doc.metadata.fromCache) {
+              console.log('⏭️ Skipping cached data on first load');
+              isFirstLoad = false;
+              return;
+            }
+
+            // Apply remote changes
             if (remoteData.todayTasks) state.todayTasks = remoteData.todayTasks;
             if (remoteData.templates) state.templates = remoteData.templates;
             if (remoteData.history) state.history = remoteData.history;
