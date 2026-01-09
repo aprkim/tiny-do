@@ -670,6 +670,13 @@
             color: #DC2626;
         }
 
+        #scheduleTaskInput:focus,
+        #scheduleStartTime:focus,
+        #scheduleEndTime:focus {
+            outline: none;
+            border-color: #BF3143;
+        }
+
         /* ==================== ADD TASK SECTION ==================== */
         .add-task-section {
             background: white;
@@ -1666,17 +1673,17 @@
             </svg>
             <span>Schedule</span>
         </button>
-        <button class="nav-tab" data-tab="templates">
-            <svg viewBox="0 0 24 24">
-                <path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5H4V5zm0 7h6v7a1 1 0 01-1 1H5a1 1 0 01-1-1v-7zm10-7a1 1 0 011-1h4a1 1 0 011 1v5h-6V5zm0 7h6v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"/>
-            </svg>
-            <span>Templates</span>
-        </button>
         <button class="nav-tab" data-tab="history">
             <svg viewBox="0 0 24 24">
                 <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
             <span>History</span>
+        </button>
+        <button class="nav-tab" data-tab="templates">
+            <svg viewBox="0 0 24 24">
+                <path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5H4V5zm0 7h6v7a1 1 0 01-1 1H5a1 1 0 01-1-1v-7zm10-7a1 1 0 011-1h4a1 1 0 011 1v5h-6V5zm0 7h6v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"/>
+            </svg>
+            <span>Templates</span>
         </button>
         <button class="nav-tab" data-tab="settings">
             <svg viewBox="0 0 24 24">
@@ -1698,8 +1705,8 @@
             <div class="modal-title" id="modalTitle">Confirm</div>
             <div class="modal-message" id="modalMessage">Are you sure?</div>
             <div class="modal-buttons">
-                <button class="modal-btn cancel" id="modalCancel">Cancel</button>
-                <button class="modal-btn confirm" id="modalConfirm">OK</button>
+                <button class="modal-btn cancel" id="modalCancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn confirm" id="modalConfirm" onclick="confirmModal()">OK</button>
             </div>
         </div>
     </div>
