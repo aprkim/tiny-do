@@ -3485,6 +3485,14 @@
 
         // Listen for remote changes
         unsubscribe = userDoc.onSnapshot((doc) => {
+          console.log('📡 Snapshot received:', {
+            exists: doc.exists,
+            fromCache: doc.metadata.fromCache,
+            hasPendingWrites: doc.metadata.hasPendingWrites,
+            isFirstLoad: isFirstLoad,
+            skipInitialCache: skipInitialCache
+          });
+
           if (doc.exists) {
             const remoteData = doc.data();
 
@@ -3503,6 +3511,12 @@
               isFirstLoad = false;
               return;
             }
+
+            console.log('📥 Applying remote data:', {
+              tasksCount: remoteData.todayTasks?.length || 0,
+              templatesKeys: Object.keys(remoteData.templates || {}),
+              historyCount: remoteData.history?.length || 0
+            });
 
             // Apply remote changes
             if (remoteData.todayTasks) state.todayTasks = remoteData.todayTasks;
@@ -3527,10 +3541,13 @@
             }
 
             console.log(isFirstLoad ? '✅ Loaded from Firestore' : '✅ Synced from another device');
-          } else if (!doc.exists && isFirstLoad) {
-            // No remote data yet, push local data
-            saveToFirestore();
-            console.log('✅ Initial sync: Local → Firestore');
+          } else {
+            console.log('❌ Document does not exist in Firestore');
+            if (isFirstLoad) {
+              // No remote data yet, push local data
+              saveToFirestore();
+              console.log('✅ Initial sync: Local → Firestore');
+            }
           }
 
           isFirstLoad = false;
