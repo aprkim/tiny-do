@@ -1639,9 +1639,9 @@
                     <input type="time" id="scheduleStartTime" placeholder="Start" style="flex: 1; min-width: 100px; padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px;">
                     <input type="time" id="scheduleEndTime" placeholder="End" style="flex: 1; min-width: 100px; padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px;">
                     <input type="text" id="scheduleTaskInput" placeholder="What will you do?" style="flex: 2; min-width: 200px; padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px;">
-                    <button id="scheduleAddBtn" onclick="addScheduleBlock()" class="action-btn" style="padding: 10px 20px; white-space: nowrap;">Add</button>
+                    <button id="scheduleAddBtn" class="action-btn" style="padding: 10px 20px; white-space: nowrap;">Add</button>
                 </div>
-                <button onclick="copyYesterdaySchedule()" class="action-btn secondary" style="background: #F8FAFC; color: #64748B; border: 1px solid #CBD5E1;">Copy from Yesterday</button>
+                <button id="copyYesterdayBtn" class="action-btn secondary" style="background: #F8FAFC; color: #64748B; border: 1px solid #CBD5E1;">Copy from Yesterday</button>
             </div>
 
             <!-- Schedule List Section -->
@@ -2758,6 +2758,8 @@
             const end = endInput.value.trim();
             const text = taskInput.value.trim();
 
+            console.log('addScheduleBlock - start:', start, 'end:', end, 'text:', text);
+
             if (!start || !end || !text) {
                 showAlertModal('Missing Information', 'Please fill in start time, end time, and task description.');
                 return;
@@ -3195,28 +3197,8 @@
                 scheduleTextInput.focus();
             });
 
-            // Arrow key navigation between time fields
-            scheduleStartInput.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowRight' && scheduleStartInput.value) {
-                    e.preventDefault();
-                    scheduleEndInput.focus();
-                }
-            });
-            scheduleEndInput.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    scheduleStartInput.focus();
-                } else if (e.key === 'ArrowRight' && scheduleEndInput.value) {
-                    e.preventDefault();
-                    scheduleTextInput.focus();
-                }
-            });
-            scheduleTextInput.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft' && scheduleTextInput.selectionStart === 0) {
-                    e.preventDefault();
-                    scheduleEndInput.focus();
-                }
-            });
+            // Tab navigation is handled natively by the browser
+            // Users can use Tab to move forward and Shift+Tab to move backward
 
             // Add on Enter key
             scheduleTextInput.addEventListener('keypress', (e) => {
