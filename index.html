@@ -3195,6 +3195,29 @@
                 scheduleTextInput.focus();
             });
 
+            // Arrow key navigation between time fields
+            scheduleStartInput.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' && scheduleStartInput.value) {
+                    e.preventDefault();
+                    scheduleEndInput.focus();
+                }
+            });
+            scheduleEndInput.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    scheduleStartInput.focus();
+                } else if (e.key === 'ArrowRight' && scheduleEndInput.value) {
+                    e.preventDefault();
+                    scheduleTextInput.focus();
+                }
+            });
+            scheduleTextInput.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft' && scheduleTextInput.selectionStart === 0) {
+                    e.preventDefault();
+                    scheduleEndInput.focus();
+                }
+            });
+
             // Add on Enter key
             scheduleTextInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && scheduleTextInput.value.trim() && scheduleStartInput.value && scheduleEndInput.value) {
