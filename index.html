@@ -2901,12 +2901,13 @@
         updateSyncCodeDisplay(syncCode);
         updateDataManagementState();
         updateSyncPill(true);
-        
+
         // Restart Firebase sync with new code
         if (unsubscribe) unsubscribe();
         isFirstLoad = true;
+        skipInitialCache = false; // Allow cache when explicitly linking a sync code
         setupFirebaseSync();
-        
+
         return true;
       }
 
@@ -3475,6 +3476,7 @@
       // Setup Firebase real-time sync
       let unsubscribe = null;
       let isFirstLoad = true;
+      let skipInitialCache = true; // Only skip cache on very first app load, not when linking
 
       function setupFirebaseSync() {
         if (!firebaseReady || !syncCode) return;
@@ -3494,9 +3496,10 @@
               return;
             }
 
-            // On first load, skip if this is coming from cache (not server)
-            if (isFirstLoad && doc.metadata.fromCache) {
-              console.log('⏭️ Skipping cached data on first load');
+            // On first app load only, skip if this is coming from cache (not server)
+            // But allow cache when user explicitly links a sync code
+            if (isFirstLoad && skipInitialCache && doc.metadata.fromCache) {
+              console.log('⏭️ Skipping cached data on initial app load');
               isFirstLoad = false;
               return;
             }
