@@ -1828,7 +1828,7 @@
             const code = input.value.trim().toLowerCase();
 
             if (!code) {
-                alert('Please enter a sync code.');
+                showAlertModal('Sync Code Required', 'Please enter a sync code.');
                 return;
             }
 
@@ -1848,6 +1848,7 @@
             // Initialize Firebase sync (will load data from Firestore)
             skipInitialCache = false; // Allow loading from cache/server
             isFirstLoad = true;
+            expectingDataFromSync = true; // User expects data to exist for this code
             setupFirebaseSync();
 
             // Show main app
@@ -2569,7 +2570,24 @@
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalMessage').textContent = message;
             document.getElementById('confirmModal').classList.remove('hidden');
+
+            // Show both buttons for confirm modal
+            document.getElementById('modalCancel').style.display = 'block';
+            document.getElementById('modalConfirm').textContent = 'OK';
+
             modalCallback = onConfirm;
+        }
+
+        function showAlertModal(title, message, onOk) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('confirmModal').classList.remove('hidden');
+
+            // Hide cancel button for alert modal
+            document.getElementById('modalCancel').style.display = 'none';
+            document.getElementById('modalConfirm').textContent = 'OK';
+
+            modalCallback = onOk || (() => {});
         }
 
         function closeModal() {
@@ -2924,6 +2942,7 @@
         if (unsubscribe) unsubscribe();
         isFirstLoad = true;
         skipInitialCache = false; // Allow cache when explicitly linking a sync code
+        expectingDataFromSync = true; // User expects data to exist for this code
         setupFirebaseSync();
 
         return true;
@@ -3134,7 +3153,7 @@
         // Visibility rules
         if (resetCard) resetCard.style.display = isConnected ? 'none' : 'block';
         if (disconnectCard) disconnectCard.style.display = isConnected ? 'block' : 'none';
-        if (deleteCard) deleteCard.style.display = isConnected ? 'block' : 'none';
+        if (deleteCard) deleteCard.style.display = 'block'; // Always show delete option
 
         if (resetBtn) {
           resetBtn.disabled = isConnected;
@@ -3490,6 +3509,7 @@
       let unsubscribe = null;
       let isFirstLoad = true;
       let skipInitialCache = true; // Only skip cache on very first app load, not when linking
+      let expectingDataFromSync = false; // Track when user is expecting to load data from sync code
 
       function setupFirebaseSync() {
         if (!firebaseReady || !syncCode) return;
@@ -3503,7 +3523,8 @@
             fromCache: doc.metadata.fromCache,
             hasPendingWrites: doc.metadata.hasPendingWrites,
             isFirstLoad: isFirstLoad,
-            skipInitialCache: skipInitialCache
+            skipInitialCache: skipInitialCache,
+            expectingDataFromSync: expectingDataFromSync
           });
 
           if (doc.exists) {
@@ -3554,8 +3575,29 @@
             }
 
             console.log(isFirstLoad ? '✅ Loaded from Firestore' : '✅ Synced from another device');
+            expectingDataFromSync = false; // Data found, clear flag
           } else {
             console.log('❌ Document does not exist in Firestore');
+
+            // If user was expecting data from this sync code, show error
+            if (expectingDataFromSync) {
+              showAlertModal(
+                'Sync code not found',
+                'This code didn\'t match any data.',
+                () => {
+                  // Clear the invalid sync code
+                  localStorage.removeItem('tinywins_sync_code');
+                  syncCode = null;
+                  expectingDataFromSync = false;
+
+                  // Go back to onboarding
+                  localStorage.removeItem(STORAGE_KEYS.SETUP_COMPLETE);
+                  location.reload();
+                }
+              );
+              return;
+            }
+
             if (isFirstLoad) {
               // No remote data yet, push local data
               saveToFirestore();
