@@ -1401,46 +1401,40 @@
             }
 
             .schedule-block {
-                display: grid;
-                grid-template-columns: auto auto auto auto 1fr auto;
-                grid-template-rows: auto;
-                gap: 4px;
-                padding: 10px 12px;
+                display: flex;
                 align-items: start;
+                gap: 6px;
+                padding: 10px 12px;
             }
 
             .schedule-block .task-checkbox {
-                grid-column: 1;
                 width: 18px;
                 height: 18px;
                 margin-top: 2px;
+                flex-shrink: 0;
             }
 
-            .schedule-block .schedule-time-input:first-of-type {
-                grid-column: 2;
-                width: 38px;
+            .schedule-time-range {
+                display: flex;
+                align-items: center;
+                gap: 3px;
+                flex-shrink: 0;
+            }
+
+            .schedule-block .schedule-time-input {
+                width: 40px;
                 font-size: 12px;
-                padding: 3px 0px;
+                padding: 3px 2px;
                 text-align: center;
             }
 
             .schedule-block .schedule-time-separator {
-                grid-column: 3;
                 font-size: 12px;
-                padding: 3px 0px;
-            }
-
-            .schedule-block .schedule-time-input:last-of-type {
-                grid-column: 4;
-                width: 38px;
-                font-size: 12px;
-                padding: 3px 0px;
-                text-align: center;
+                padding: 0;
             }
 
             .schedule-block .schedule-text-input {
-                grid-column: 5;
-                width: 100%;
+                flex: 1;
                 min-width: 0;
                 font-size: 14px;
                 padding: 4px 8px;
@@ -1451,8 +1445,7 @@
             }
 
             .schedule-block .schedule-btn-icon {
-                grid-column: 6;
-                margin-left: 0;
+                flex-shrink: 0;
                 padding: 2px;
                 margin-top: 2px;
             }
@@ -2910,11 +2903,13 @@
                 <div class="schedule-block ${block.done ? 'done' : ''}" data-id="${block.id}">
                     <input type="checkbox" class="task-checkbox" ${block.done ? 'checked' : ''}
                            onchange="toggleScheduleBlock(${block.id})">
-                    <input type="text" class="schedule-time-input" value="${block.start}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
-                           onchange="updateScheduleBlockTime(${block.id}, 'start', this.value)" />
-                    <span class="schedule-time-separator">–</span>
-                    <input type="text" class="schedule-time-input" value="${block.end}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
-                           onchange="updateScheduleBlockTime(${block.id}, 'end', this.value)" />
+                    <div class="schedule-time-range">
+                        <input type="text" class="schedule-time-input" value="${block.start}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
+                               onchange="updateScheduleBlockTime(${block.id}, 'start', this.value)" />
+                        <span class="schedule-time-separator">–</span>
+                        <input type="text" class="schedule-time-input" value="${block.end}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
+                               onchange="updateScheduleBlockTime(${block.id}, 'end', this.value)" />
+                    </div>
                     <input type="text" class="schedule-text-input" value="${escapeHtml(block.text)}"
                            onchange="updateScheduleBlockText(${block.id}, this.value)"
                            placeholder="What will you do?" />
