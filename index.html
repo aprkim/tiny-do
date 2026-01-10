@@ -1784,8 +1784,8 @@
                     Plan Your Focus
                 </div>
                 <div style="display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
-                    <input type="time" id="scheduleStartTime" placeholder="Start" style="width: 90px; padding: 8px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; color: #9CA3AF;">
-                    <input type="time" id="scheduleEndTime" placeholder="End" style="width: 90px; padding: 8px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; color: #9CA3AF;">
+                    <input type="text" id="scheduleStartTime" placeholder="09:00" pattern="[0-2][0-9]:[0-5][0-9]" maxlength="5" style="width: 90px; padding: 8px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; color: #334155; text-align: center;">
+                    <input type="text" id="scheduleEndTime" placeholder="10:00" pattern="[0-2][0-9]:[0-5][0-9]" maxlength="5" style="width: 90px; padding: 8px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px; color: #334155; text-align: center;">
                     <input type="text" id="scheduleTaskInput" placeholder="What will you do?" style="flex: 1; min-width: 200px; padding: 8px 10px; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 14px;">
                     <button id="scheduleAddBtn" class="action-btn" style="padding: 8px 16px; white-space: nowrap; border-radius: 8px;">Add</button>
                 </div>
@@ -2902,10 +2902,10 @@
                 <div class="schedule-block ${block.done ? 'done' : ''}" data-id="${block.id}">
                     <input type="checkbox" class="task-checkbox" ${block.done ? 'checked' : ''}
                            onchange="toggleScheduleBlock(${block.id})">
-                    <input type="time" class="schedule-time-input" value="${block.start}"
+                    <input type="text" class="schedule-time-input" value="${block.start}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                            onchange="updateScheduleBlockTime(${block.id}, 'start', this.value)" />
                     <span class="schedule-time-separator">–</span>
-                    <input type="time" class="schedule-time-input" value="${block.end}"
+                    <input type="text" class="schedule-time-input" value="${block.end}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                            onchange="updateScheduleBlockTime(${block.id}, 'end', this.value)" />
                     <input type="text" class="schedule-text-input" value="${escapeHtml(block.text)}"
                            onchange="updateScheduleBlockText(${block.id}, this.value)"
@@ -3404,6 +3404,19 @@
             });
 
             scheduleAddBtn.addEventListener('click', addScheduleBlock);
+
+            // Auto-format time inputs (add colon automatically)
+            function formatTimeInput(input) {
+                input.addEventListener('input', (e) => {
+                    let value = e.target.value.replace(/[^0-9]/g, '');
+                    if (value.length >= 2) {
+                        value = value.slice(0, 2) + ':' + value.slice(2, 4);
+                    }
+                    e.target.value = value;
+                });
+            }
+            formatTimeInput(scheduleStartInput);
+            formatTimeInput(scheduleEndInput);
 
             document.getElementById('scheduleDatePicker').addEventListener('change', onScheduleDateChange);
             document.getElementById('scheduleHeaderDate').addEventListener('click', () => {
