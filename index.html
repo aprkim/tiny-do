@@ -1669,9 +1669,10 @@
             <a href="https://tinywins.space" class="suite-back-link">← TinyWins</a>
             <div class="header">
                 <div class="header-title">Today's Schedule</div>
-                <div class="header-date">
-                    <input type="date" id="scheduleDatePicker" class="schedule-date-picker" />
+                <div class="header-date" id="scheduleHeaderDate" style="font-size: 16px; color: #64748B; cursor: pointer;">
+                    Saturday, January 10, 2026
                 </div>
+                <input type="date" id="scheduleDatePicker" class="schedule-date-picker" style="display: none;" />
             </div>
 
             <!-- Add Time Block Section -->
@@ -2194,6 +2195,12 @@
                 
                 localStorage.setItem(STORAGE_KEYS.TODAY_DATE, state.todayDate);
                 localStorage.setItem(STORAGE_KEYS.TODAY_MODE, state.todayMode);
+
+                // Reset schedule to today's date
+                if (state.activeTab === 'schedule') {
+                    state.activeScheduleDate = today;
+                    loadScheduleView();
+                }
             }
         }
 
@@ -2762,8 +2769,18 @@
             // Set date picker value
             document.getElementById('scheduleDatePicker').value = date;
 
+            // Update formatted date display
+            updateScheduleDateDisplay(date);
+
             // Render schedule list
             renderScheduleList();
+        }
+
+        function updateScheduleDateDisplay(dateString) {
+            const date = new Date(dateString + 'T00:00:00');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formatted = date.toLocaleDateString('en-US', options);
+            document.getElementById('scheduleHeaderDate').textContent = formatted;
         }
 
         function renderScheduleList() {
@@ -2949,6 +2966,7 @@
         function onScheduleDateChange() {
             const picker = document.getElementById('scheduleDatePicker');
             state.activeScheduleDate = picker.value;
+            updateScheduleDateDisplay(picker.value);
             renderScheduleList();
         }
 
@@ -3288,7 +3306,9 @@
             scheduleAddBtn.addEventListener('click', addScheduleBlock);
 
             document.getElementById('scheduleDatePicker').addEventListener('change', onScheduleDateChange);
-            document.getElementById('copyYesterdayBtn').addEventListener('click', copyYesterdaySchedule);
+            document.getElementById('scheduleHeaderDate').addEventListener('click', () => {
+                document.getElementById('scheduleDatePicker').showPicker();
+            });
 
             // History tab
             document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
