@@ -4409,7 +4409,8 @@
             console.log('📥 Applying remote data:', {
               tasksCount: remoteData.todayTasks?.length || 0,
               templatesKeys: Object.keys(remoteData.templates || {}),
-              historyCount: remoteData.history?.length || 0
+              historyCount: remoteData.history?.length || 0,
+              scheduleDates: Object.keys(remoteData.scheduleByDate || {})
             });
 
             // Apply remote changes
@@ -4417,7 +4418,10 @@
             if (remoteData.templates) window.state.templates = remoteData.templates;
             if (remoteData.history) window.state.history = remoteData.history;
             if (remoteData.todayMode) window.state.todayMode = remoteData.todayMode;
-            if (remoteData.scheduleByDate) window.state.scheduleByDate = remoteData.scheduleByDate;
+            if (remoteData.scheduleByDate) {
+              console.log('📥 Received schedule data for dates:', Object.keys(remoteData.scheduleByDate));
+              window.state.scheduleByDate = remoteData.scheduleByDate;
+            }
 
             // Save to localStorage to keep it in sync
             localStorage.setItem(STORAGE_KEYS.TODAY_TASKS, JSON.stringify(window.state.todayTasks));
@@ -4487,15 +4491,19 @@
         if (!firebaseReady || !syncCode) return;
 
         try {
-          await db.collection('tinyWins').doc(syncCode).set({
+          const dataToSave = {
             todayTasks: window.state.todayTasks,
             templates: window.state.templates,
             history: window.state.history,
             todayMode: window.state.todayMode,
             scheduleByDate: window.state.scheduleByDate,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
-          
+          };
+
+          console.log('💾 Saving to Firestore - schedule dates:', Object.keys(dataToSave.scheduleByDate));
+
+          await db.collection('tinyWins').doc(syncCode).set(dataToSave, { merge: true });
+
           console.log('✅ Saved to Firestore');
         } catch (error) {
           console.error('❌ Save failed:', error);
