@@ -730,7 +730,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            padding: 6px;
+            padding: 8px;
             border-radius: 6px;
             color: #94A3B8;
             display: flex;
@@ -738,11 +738,18 @@
             justify-content: center;
             transition: all 0.2s;
             margin-left: 8px;
+            min-width: 32px;
+            min-height: 32px;
         }
 
         .schedule-btn-icon:hover {
             background: #FEF2F2;
             color: #DC2626;
+        }
+
+        .schedule-btn-icon:active {
+            background: #FEE2E2;
+            transform: scale(0.95);
         }
 
         #scheduleTaskInput:focus,
@@ -1495,13 +1502,16 @@
 
             .schedule-block .schedule-btn-icon {
                 flex-shrink: 0;
-                padding: 2px;
+                padding: 6px;
                 margin-top: 2px;
+                margin-left: 4px;
+                min-width: 36px;
+                min-height: 36px;
             }
 
             .schedule-block .schedule-btn-icon svg {
-                width: 14px;
-                height: 14px;
+                width: 16px;
+                height: 16px;
             }
 
             #scheduleStartTime,
@@ -3090,6 +3100,7 @@
         }
 
         function deleteScheduleBlock(blockId) {
+            console.log('🗑️ Deleting schedule block:', blockId);
             const date = state.activeScheduleDate;
             const blocks = state.scheduleByDate[date] || [];
             state.scheduleByDate[date] = blocks.filter(b => b.id !== blockId);
