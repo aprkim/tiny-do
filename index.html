@@ -3271,48 +3271,51 @@
 
         function setupTodayDragAndDrop() {
             const taskItems = document.querySelectorAll('#todayTaskList .task-item');
-            
+            let touchStartY = 0;
+            let touchCurrentY = 0;
+
             taskItems.forEach((item, index) => {
                 const handle = item.querySelector('.drag-handle');
-                
+
+                // Mouse events for desktop
                 handle.addEventListener('mousedown', () => {
                     item.setAttribute('draggable', 'true');
                 });
-                
+
                 item.addEventListener('dragstart', (e) => {
                     draggedItem = item;
                     draggedIndex = index;
                     item.classList.add('dragging');
                 });
-                
+
                 item.addEventListener('dragend', (e) => {
                     item.classList.remove('dragging');
                     item.setAttribute('draggable', 'false');
                     draggedItem = null;
                     draggedIndex = null;
                 });
-                
+
                 item.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     item.classList.add('drag-over');
                 });
-                
+
                 item.addEventListener('dragleave', (e) => {
                     item.classList.remove('drag-over');
                 });
-                
+
                 item.addEventListener('drop', (e) => {
                     e.preventDefault();
                     item.classList.remove('drag-over');
-                    
+
                     if (draggedItem && draggedItem !== item) {
                         const activeTasks = state.todayTasks.filter(t => !t.completed);
                         const targetIndex = Array.from(taskItems).indexOf(item);
-                        
+
                         // Reorder in the active tasks array
                         const [movedTask] = activeTasks.splice(draggedIndex, 1);
                         activeTasks.splice(targetIndex, 0, movedTask);
-                        
+
                         // Update state.todayTasks preserving completed tasks
                         const completedTasks = state.todayTasks.filter(t => t.completed);
                         state.todayTasks = [...activeTasks, ...completedTasks];
@@ -3322,58 +3325,182 @@
                         renderTodayTasks();
                     }
                 });
+
+                // Touch events for mobile
+                handle.addEventListener('touchstart', (e) => {
+                    draggedItem = item;
+                    draggedIndex = index;
+                    touchStartY = e.touches[0].clientY;
+                    item.classList.add('dragging');
+                }, { passive: true });
+
+                handle.addEventListener('touchmove', (e) => {
+                    if (!draggedItem) return;
+                    e.preventDefault();
+
+                    touchCurrentY = e.touches[0].clientY;
+                    const deltaY = touchCurrentY - touchStartY;
+
+                    // Find which item we're over
+                    const items = Array.from(taskItems);
+                    const afterElement = items.find(otherItem => {
+                        if (otherItem === draggedItem) return false;
+                        const box = otherItem.getBoundingClientRect();
+                        const offset = touchCurrentY - box.top - box.height / 2;
+                        return offset < 0;
+                    });
+
+                    // Remove all drag-over classes
+                    items.forEach(i => i.classList.remove('drag-over'));
+
+                    // Add drag-over to target
+                    if (afterElement) {
+                        afterElement.classList.add('drag-over');
+                    }
+                }, { passive: false });
+
+                handle.addEventListener('touchend', (e) => {
+                    if (!draggedItem) return;
+
+                    const items = Array.from(taskItems);
+                    const targetItem = items.find(i => i.classList.contains('drag-over'));
+
+                    if (targetItem && targetItem !== draggedItem) {
+                        const activeTasks = state.todayTasks.filter(t => !t.completed);
+                        const targetIndex = items.indexOf(targetItem);
+
+                        // Reorder in the active tasks array
+                        const [movedTask] = activeTasks.splice(draggedIndex, 1);
+                        activeTasks.splice(targetIndex, 0, movedTask);
+
+                        // Update state.todayTasks preserving completed tasks
+                        const completedTasks = state.todayTasks.filter(t => t.completed);
+                        state.todayTasks = [...activeTasks, ...completedTasks];
+
+                        // Save the new order
+                        saveTodayTasks();
+                        renderTodayTasks();
+                    }
+
+                    // Clean up
+                    items.forEach(i => i.classList.remove('drag-over'));
+                    item.classList.remove('dragging');
+                    draggedItem = null;
+                    draggedIndex = null;
+                }, { passive: true });
             });
         }
 
         function setupTemplateDragAndDrop() {
             const templateItems = document.querySelectorAll('#templateTaskList .template-item');
-            
+            let touchStartY = 0;
+            let touchCurrentY = 0;
+
             templateItems.forEach((item, index) => {
                 const handle = item.querySelector('.drag-handle');
-                
+
+                // Mouse events for desktop
                 handle.addEventListener('mousedown', () => {
                     item.setAttribute('draggable', 'true');
                 });
-                
+
                 item.addEventListener('dragstart', (e) => {
                     draggedItem = item;
                     draggedIndex = index;
                     item.classList.add('dragging');
                 });
-                
+
                 item.addEventListener('dragend', (e) => {
                     item.classList.remove('dragging');
                     item.setAttribute('draggable', 'false');
                     draggedItem = null;
                     draggedIndex = null;
                 });
-                
+
                 item.addEventListener('dragover', (e) => {
                     e.preventDefault();
                     item.classList.add('drag-over');
                 });
-                
+
                 item.addEventListener('dragleave', (e) => {
                     item.classList.remove('drag-over');
                 });
-                
+
                 item.addEventListener('drop', (e) => {
                     e.preventDefault();
                     item.classList.remove('drag-over');
-                    
+
                     if (draggedItem && draggedItem !== item) {
                         const targetIndex = Array.from(templateItems).indexOf(item);
                         const tasks = state.templates[state.activeTemplateMode];
-                        
+
                         // Reorder the template tasks
                         const [movedTask] = tasks.splice(draggedIndex, 1);
                         tasks.splice(targetIndex, 0, movedTask);
-                        
+
                         // Save to localStorage - this is permanent
                         saveTemplates();
                         renderTemplateList();
                     }
                 });
+
+                // Touch events for mobile
+                handle.addEventListener('touchstart', (e) => {
+                    draggedItem = item;
+                    draggedIndex = index;
+                    touchStartY = e.touches[0].clientY;
+                    item.classList.add('dragging');
+                }, { passive: true });
+
+                handle.addEventListener('touchmove', (e) => {
+                    if (!draggedItem) return;
+                    e.preventDefault();
+
+                    touchCurrentY = e.touches[0].clientY;
+
+                    // Find which item we're over
+                    const items = Array.from(templateItems);
+                    const afterElement = items.find(otherItem => {
+                        if (otherItem === draggedItem) return false;
+                        const box = otherItem.getBoundingClientRect();
+                        const offset = touchCurrentY - box.top - box.height / 2;
+                        return offset < 0;
+                    });
+
+                    // Remove all drag-over classes
+                    items.forEach(i => i.classList.remove('drag-over'));
+
+                    // Add drag-over to target
+                    if (afterElement) {
+                        afterElement.classList.add('drag-over');
+                    }
+                }, { passive: false });
+
+                handle.addEventListener('touchend', (e) => {
+                    if (!draggedItem) return;
+
+                    const items = Array.from(templateItems);
+                    const targetItem = items.find(i => i.classList.contains('drag-over'));
+
+                    if (targetItem && targetItem !== draggedItem) {
+                        const targetIndex = items.indexOf(targetItem);
+                        const tasks = state.templates[state.activeTemplateMode];
+
+                        // Reorder the template tasks
+                        const [movedTask] = tasks.splice(draggedIndex, 1);
+                        tasks.splice(targetIndex, 0, movedTask);
+
+                        // Save to localStorage - this is permanent
+                        saveTemplates();
+                        renderTemplateList();
+                    }
+
+                    // Clean up
+                    items.forEach(i => i.classList.remove('drag-over'));
+                    item.classList.remove('dragging');
+                    draggedItem = null;
+                    draggedIndex = null;
+                }, { passive: true });
             });
         }
 
