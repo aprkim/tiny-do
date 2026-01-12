@@ -1760,6 +1760,25 @@
                     <input id="enterSyncCodeInput" type="text" placeholder="Enter sync code from another device or browser" style="flex: 0 0 75%; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; min-width: 0; background: white; outline: none; box-shadow: none;">
                     <button data-sync-link="card" onclick="submitSyncCode()" style="flex: 0 0 20%; padding: 12px 14px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; background: #eef2f7; color: #5b6474; cursor: pointer; transition: background 0.2s; min-width: 0; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1;">Link</button>
                 </div>
+
+                <!-- Save to Tiny Spaces -->
+                <div style="margin-top: 16px; padding: 14px; border: 1px solid #e5e7eb; border-radius: 12px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #0284c7;">
+                                <path d="M5 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span style="font-size: 14px; font-weight: 600; color: #0c4a6e;">Tiny Spaces</span>
+                        </div>
+                        <span id="tinySpacesStatus" style="font-size: 12px; color: #64748b;"></span>
+                    </div>
+                    <button id="saveToSpacesBtn" onclick="saveToTinySpaces()" style="width: 100%; padding: 10px 14px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; background: #0284c7; color: white; cursor: pointer; transition: background 0.2s;">
+                        Save to My Spaces
+                    </button>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.4;">
+                        Access this space from <a href="https://tinywins.space/spaces/" target="_blank" style="color: #0284c7; text-decoration: none;">tinywins.space/spaces</a>
+                    </div>
+                </div>
             </div>
 
             <!-- Data Management Card -->
@@ -2064,12 +2083,63 @@
         function init() {
             migrateOldData();
             loadState();
-            
+
+            // Check for deep link (?space=<syncCode>)
+            handleDeepLink();
+
             if (!state.setupComplete) {
                 showOnboarding();
             } else {
                 showMainApp();
             }
+        }
+
+        function handleDeepLink() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const spaceCode = urlParams.get('space');
+
+            if (!spaceCode) return;
+
+            const currentCode = localStorage.getItem('tinywins_sync_code');
+
+            // If same code, just continue
+            if (currentCode === spaceCode) {
+                console.log('✅ Already using this space:', spaceCode);
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
+
+            // If different code, show confirmation
+            const hasLocalData = state.todayTasks.length > 0 ||
+                                 Object.keys(state.scheduleByDate).length > 0;
+
+            if (hasLocalData && currentCode) {
+                showConfirmModal(
+                    'Switch to Different Space?',
+                    `This will switch from "${currentCode}" to "${spaceCode}". Your current data is synced and won't be lost.`,
+                    () => {
+                        switchToSpace(spaceCode);
+                    }
+                );
+            } else {
+                // No local data or no existing sync, just switch
+                switchToSpace(spaceCode);
+            }
+        }
+
+        function switchToSpace(newSyncCode) {
+            console.log('🔄 Switching to space:', newSyncCode);
+
+            // Set the new sync code
+            localStorage.setItem('tinywins_sync_code', newSyncCode);
+            window.syncCode = newSyncCode;
+
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+
+            // Reload to fetch data from new space
+            location.reload();
         }
 
         function loadState() {
@@ -4311,9 +4381,26 @@
       }
 
       try {
+        // Initialize Tiny Do's own Firebase (tiny-wins25)
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
         auth = firebase.auth();
+
+        // Initialize Umbrella Firebase (tinywins-account) as named instance
+        const umbrellaConfig = {
+          apiKey: "AIzaSyBycFP3HfMF7tyshQixvwzoaAE3Df8Fz_8",
+          authDomain: "tinywins-account.firebaseapp.com",
+          projectId: "tinywins-account",
+          storageBucket: "tinywins-account.firebasestorage.app",
+          messagingSenderId: "497477643272",
+          appId: "1:497477643272:web:UMBRELLA_APP_ID_HERE"
+        };
+        const umbrellaApp = firebase.initializeApp(umbrellaConfig, "tinyAccount");
+        const umbrellaDb = umbrellaApp.firestore();
+        const umbrellaAuth = umbrellaApp.auth();
+
+        console.log('✅ Tiny Do Firebase initialized (tiny-wins25)');
+        console.log('✅ Umbrella Firebase initialized (tinywins-account)');
         
         // Enable offline persistence
         db.enablePersistence({ synchronizeTabs: true })
@@ -4603,6 +4690,108 @@
         }
       };
 
+      // ==================== TINY SPACES INTEGRATION ====================
+      let umbrellaUser = null;
+      let isCheckingUmbrellaAuth = false;
+
+      // Check umbrella auth status
+      umbrellaAuth.onAuthStateChanged((user) => {
+        umbrellaUser = user;
+        updateTinySpacesStatus();
+        console.log('🏠 Umbrella auth:', user ? `Signed in as ${user.email}` : 'Not signed in');
+      });
+
+      function updateTinySpacesStatus() {
+        const statusEl = document.getElementById('tinySpacesStatus');
+        const btnEl = document.getElementById('saveToSpacesBtn');
+        if (!statusEl || !btnEl) return;
+
+        if (umbrellaUser) {
+          statusEl.textContent = '✓ Signed in';
+          statusEl.style.color = '#16a34a';
+          btnEl.textContent = 'Save to My Spaces';
+        } else {
+          statusEl.textContent = 'Not signed in';
+          statusEl.style.color = '#64748b';
+          btnEl.textContent = 'Sign In & Save';
+        }
+      }
+
+      async function saveToTinySpaces() {
+        const currentSyncCode = getSyncCode();
+        if (!currentSyncCode) {
+          showAlertModal('No Sync Code', 'Please set up sync first by showing your sync code.');
+          return;
+        }
+
+        // If not signed in, start email link auth
+        if (!umbrellaUser) {
+          const email = prompt('Enter your email to sign in to Tiny Spaces:');
+          if (!email) return;
+
+          try {
+            const actionCodeSettings = {
+              url: 'https://do.tinywins.space/',
+              handleCodeInApp: true
+            };
+
+            await umbrellaAuth.sendSignInLinkToEmail(email, actionCodeSettings);
+            window.localStorage.setItem('emailForSignIn', email);
+            showAlertModal('Check Your Email', `We sent a sign-in link to ${email}. Click the link to continue.`);
+          } catch (error) {
+            console.error('❌ Error sending sign-in email:', error);
+            showAlertModal('Error', 'Failed to send sign-in email. Please try again.');
+          }
+          return;
+        }
+
+        // User is signed in, save the space
+        try {
+          const spaceData = {
+            appId: 'do',
+            syncCode: currentSyncCode,
+            label: `Tiny Do - ${currentSyncCode.split('-').slice(0, 3).join('-')}`,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastAccessed: firebase.firestore.FieldValue.serverTimestamp()
+          };
+
+          const docId = `do_${currentSyncCode}`;
+          await umbrellaDb.collection('users').doc(umbrellaUser.uid).collection('spaces').doc(docId).set(spaceData);
+
+          showAlertModal('Saved!', 'This space has been saved to your Tiny Spaces. View it at tinywins.space/spaces');
+          updateTinySpacesStatus();
+        } catch (error) {
+          console.error('❌ Error saving space:', error);
+          showAlertModal('Error', 'Failed to save space. Please try again.');
+        }
+      }
+
+      // Handle email link sign-in on page load
+      if (umbrellaAuth.isSignInWithEmailLink(window.location.href)) {
+        let email = window.localStorage.getItem('emailForSignIn');
+        if (!email) {
+          email = prompt('Please provide your email for confirmation:');
+        }
+
+        if (email) {
+          umbrellaAuth.signInWithEmailLink(email, window.location.href)
+            .then((result) => {
+              window.localStorage.removeItem('emailForSignIn');
+              console.log('✅ Signed in successfully');
+              showAlertModal('Welcome!', 'You are now signed in to Tiny Spaces.');
+              // Clean up the URL
+              window.history.replaceState({}, document.title, window.location.pathname);
+            })
+            .catch((error) => {
+              console.error('❌ Sign-in error:', error);
+              showAlertModal('Error', 'Failed to sign in. Please try again.');
+            });
+        }
+      }
+
+      // Expose functions globally
+      window.saveToTinySpaces = saveToTinySpaces;
+
       // Sync Code UI Functions
       function showSyncCodeModal() {
         let code = getSyncCode();
@@ -4633,5 +4822,12 @@
       window.showSyncCodeModal = showSyncCodeModal;
       window.promptEnterSyncCode = promptEnterSyncCode;
     </script>
+
+    
+<script src="app.js"></script>
+</body>
+</html>
+
+
 </body>
 </html>
