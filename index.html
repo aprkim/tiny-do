@@ -4424,7 +4424,10 @@
       // Expose sync function globally so save functions can call it
       window.syncToFirebase = function() {
         if (firebaseReady && syncCode) {
+          console.log('🔄 Triggering sync to Firestore...');
           saveToFirestore();
+        } else {
+          console.log('⏸️ Sync skipped:', { firebaseReady, syncCode: !!syncCode });
         }
       };
 
