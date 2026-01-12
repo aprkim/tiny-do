@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tiny Spaces</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-card {
+            text-align: center;
+        }
+
+        .auth-card input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .spaces-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .space-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .space-item:hover {
+            background: #f3f4f6;
+            border-color: #d1d5db;
+        }
+
+        .space-info {
+            flex: 1;
+        }
+
+        .space-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .space-meta {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .app-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #dbeafe;
+            color: #1e40af;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .user-info {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 My Tiny Spaces</h1>
+            <p>Your saved workspaces across TinyWins apps</p>
+        </div>
+
+        <!-- Auth Card (shown when not signed in) -->
+        <div id="authCard" class="card auth-card" style="display: none;">
+            <h2 style="margin-bottom: 16px; color: #111827;">Sign In</h2>
+            <p style="margin-bottom: 20px; color: #6b7280;">Enter your email to access your saved spaces</p>
+            <input type="email" id="emailInput" placeholder="your@email.com">
+            <button class="btn btn-primary" onclick="sendSignInLink()">Send Sign-In Link</button>
+            <p id="authMessage" style="margin-top: 12px; font-size: 14px;"></p>
+        </div>
+
+        <!-- Spaces List (shown when signed in) -->
+        <div id="spacesCard" class="card" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h2 style="color: #111827;">Your Spaces</h2>
+                <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
+            </div>
+            <div id="userInfo" class="user-info"></div>
+            <div id="spacesList" class="spaces-list">
+                <div class="loading">Loading your spaces...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script>
+        // Firebase config for tinywins-account
+        const firebaseConfig = {
+            apiKey: "AIzaSyBycFP3HfMF7tyshQixvwzoaAE3Df8Fz_8",
+            authDomain: "tinywins-account.firebaseapp.com",
+            projectId: "tinywins-account",
+            storageBucket: "tinywins-account.firebasestorage.app",
+            messagingSenderId: "497477643272",
+            appId: "1:497477643272:web:UMBRELLA_APP_ID_HERE"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        // Auth state observer
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            console.log('Auth state:', user ? `Signed in as ${user.email}` : 'Not signed in');
+
+            if (user) {
+                showSpaces();
+                loadSpaces();
+            } else {
+                showAuth();
+            }
+        });
+
+        // Handle email link sign-in on page load
+        if (auth.isSignInWithEmailLink(window.location.href)) {
+            let email = window.localStorage.getItem('emailForSignIn');
+            if (!email) {
+                email = prompt('Please provide your email for confirmation:');
+            }
+
+            if (email) {
+                auth.signInWithEmailLink(email, window.location.href)
+                    .then((result) => {
+                        window.localStorage.removeItem('emailForSignIn');
+                        console.log('✅ Signed in successfully');
+                        window.history.replaceState({}, document.title, window.location.pathname);
+                    })
+                    .catch((error) => {
+                        console.error('❌ Sign-in error:', error);
+                        showMessage('Sign-in failed. Please try again.', 'error');
+                    });
+            }
+        }
+
+        function showAuth() {
+            document.getElementById('authCard').style.display = 'block';
+            document.getElementById('spacesCard').style.display = 'none';
+        }
+
+        function showSpaces() {
+            document.getElementById('authCard').style.display = 'none';
+            document.getElementById('spacesCard').style.display = 'block';
+            document.getElementById('userInfo').textContent = `Signed in as ${currentUser.email}`;
+        }
+
+        function sendSignInLink() {
+            const email = document.getElementById('emailInput').value.trim();
+            if (!email) {
+                showMessage('Please enter your email', 'error');
+                return;
+            }
+
+            const actionCodeSettings = {
+                url: 'https://tinywins.space/spaces/',
+                handleCodeInApp: true
+            };
+
+            auth.sendSignInLinkToEmail(email, actionCodeSettings)
+                .then(() => {
+                    window.localStorage.setItem('emailForSignIn', email);
+                    showMessage(`✓ Check your email! We sent a sign-in link to ${email}`, 'success');
+                })
+                .catch((error) => {
+                    console.error('Error sending email:', error);
+                    showMessage('Failed to send email. Please try again.', 'error');
+                });
+        }
+
+        function showMessage(message, type) {
+            const el = document.getElementById('authMessage');
+            el.textContent = message;
+            el.style.color = type === 'error' ? '#dc2626' : '#16a34a';
+        }
+
+        async function loadSpaces() {
+            const container = document.getElementById('spacesList');
+            container.innerHTML = '<div class="loading">Loading your spaces...</div>';
+
+            try {
+                const snapshot = await db.collection('users')
+                    .doc(currentUser.uid)
+                    .collection('spaces')
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                            </svg>
+                            <p style="font-size: 16px; margin-bottom: 8px;">No spaces yet</p>
+                            <p style="font-size: 14px;">Save a space from any TinyWins app to see it here</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const spacesHtml = snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const appUrls = {
+                        'do': 'https://do.tinywins.space',
+                        'meals': 'https://meals.tinywins.space',
+                        'body': 'https://body.tinywins.space',
+                        'nudge': 'https://nudge.tinywins.space'
+                    };
+                    const url = `${appUrls[data.appId] || '#'}?space=${data.syncCode}`;
+
+                    return `
+                        <div class="space-item">
+                            <div class="space-info">
+                                <div class="space-label">
+                                    <span class="app-badge">${data.appId.toUpperCase()}</span>
+                                    ${data.label || data.syncCode}
+                                </div>
+                                <div class="space-meta">
+                                    ${data.syncCode.split('-').slice(0, 4).join('-')}...
+                                </div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="openSpace('${url}')">
+                                Open →
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = spacesHtml;
+            } catch (error) {
+                console.error('Error loading spaces:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p style="color: #dc2626;">Failed to load spaces. Please refresh the page.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function openSpace(url) {
+            window.location.href = url;
+        }
+
+        function signOut() {
+            auth.signOut();
+        }
+    </script>
+</body>
+</html>
