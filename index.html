@@ -4502,7 +4502,9 @@
 
           console.log('💾 Saving to Firestore - schedule dates:', Object.keys(dataToSave.scheduleByDate));
 
-          await db.collection('tinyWins').doc(syncCode).set(dataToSave, { merge: true });
+          // Use set without merge to ensure deleted schedule dates are removed
+          // This replaces the entire document with the new data
+          await db.collection('tinyWins').doc(syncCode).set(dataToSave);
 
           console.log('✅ Saved to Firestore');
         } catch (error) {
