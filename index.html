@@ -3818,6 +3818,7 @@
 
       // Initialize Firebase
       let db, auth;
+      let umbrellaDb, umbrellaAuth; // Umbrella Firebase instances
       let firebaseReady = false;
       let currentUserId = null;
       let syncCode = null; // Stores the sync code for cross-device sync
@@ -4396,8 +4397,8 @@
           appId: "1:497477643272:web:UMBRELLA_APP_ID_HERE"
         };
         const umbrellaApp = firebase.initializeApp(umbrellaConfig, "tinyAccount");
-        const umbrellaDb = umbrellaApp.firestore();
-        const umbrellaAuth = umbrellaApp.auth();
+        umbrellaDb = umbrellaApp.firestore();
+        umbrellaAuth = umbrellaApp.auth();
 
         console.log('✅ Tiny Do Firebase initialized (tiny-wins25)');
         console.log('✅ Umbrella Firebase initialized (tinywins-account)');
@@ -4822,12 +4823,5 @@
       window.showSyncCodeModal = showSyncCodeModal;
       window.promptEnterSyncCode = promptEnterSyncCode;
     </script>
-
-    
-<script src="app.js"></script>
-</body>
-</html>
-
-
 </body>
 </html>
