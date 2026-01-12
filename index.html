@@ -2969,6 +2969,8 @@
             const blocks = state.scheduleByDate[date] || [];
             const container = document.getElementById('scheduleList');
 
+            console.log('📅 Rendering schedule for', date, '- blocks:', blocks.length);
+
             if (blocks.length === 0) {
                 container.innerHTML = '<div class="empty-message">No time blocks scheduled for this date.</div>';
                 return;
