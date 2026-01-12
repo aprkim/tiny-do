@@ -3316,8 +3316,9 @@
                         // Update state.todayTasks preserving completed tasks
                         const completedTasks = state.todayTasks.filter(t => t.completed);
                         state.todayTasks = [...activeTasks, ...completedTasks];
-                        
-                        // Note: Not saving to localStorage - this is temporary reordering
+
+                        // Save the new order
+                        saveTodayTasks();
                         renderTodayTasks();
                     }
                 });
