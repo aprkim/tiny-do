@@ -3006,15 +3006,22 @@
             // Add event delegation for delete buttons
             const scheduleContainer = document.getElementById('scheduleList');
             scheduleContainer.removeEventListener('click', handleScheduleDeleteClick); // Remove old listener if exists
+            scheduleContainer.removeEventListener('touchend', handleScheduleDeleteClick);
             scheduleContainer.addEventListener('click', handleScheduleDeleteClick);
+            scheduleContainer.addEventListener('touchend', handleScheduleDeleteClick);
+            console.log('✅ Event listeners attached to schedule container');
         }
 
         function handleScheduleDeleteClick(e) {
+            console.log('👆 Click detected on schedule container', e.target);
             const deleteBtn = e.target.closest('.schedule-btn-icon.delete');
+            console.log('🔍 Found delete button:', deleteBtn);
             if (deleteBtn) {
                 const blockId = parseInt(deleteBtn.getAttribute('data-block-id'));
                 console.log('🗑️ Delete button clicked via event delegation! Block ID:', blockId);
                 deleteScheduleBlock(blockId);
+            } else {
+                console.log('❌ Click was not on a delete button');
             }
         }
 
