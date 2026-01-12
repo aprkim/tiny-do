@@ -2995,13 +2995,27 @@
                     <input type="text" class="schedule-text-input" value="${escapeHtml(block.text)}"
                            onchange="updateScheduleBlockText(${block.id}, this.value)"
                            placeholder="What will you do?" />
-                    <button class="schedule-btn-icon delete" onclick="deleteScheduleBlock(${block.id})" title="Delete">
+                    <button class="schedule-btn-icon delete" data-block-id="${block.id}" title="Delete">
                         <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
                             <path d="M18 6L6 18M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
             `).join('');
+
+            // Add event delegation for delete buttons
+            const scheduleContainer = document.getElementById('scheduleList');
+            scheduleContainer.removeEventListener('click', handleScheduleDeleteClick); // Remove old listener if exists
+            scheduleContainer.addEventListener('click', handleScheduleDeleteClick);
+        }
+
+        function handleScheduleDeleteClick(e) {
+            const deleteBtn = e.target.closest('.schedule-btn-icon.delete');
+            if (deleteBtn) {
+                const blockId = parseInt(deleteBtn.getAttribute('data-block-id'));
+                console.log('🗑️ Delete button clicked via event delegation! Block ID:', blockId);
+                deleteScheduleBlock(blockId);
+            }
         }
 
         function addScheduleBlock() {
@@ -3102,7 +3116,9 @@
         }
 
         function deleteScheduleBlock(blockId) {
-            console.log('🗑️ Deleting schedule block:', blockId);
+            console.log('🗑️ DELETE FUNCTION CALLED! Block ID:', blockId);
+            console.log('🔍 Function type:', typeof deleteScheduleBlock);
+            console.log('🌐 Window function type:', typeof window.deleteScheduleBlock);
             const date = state.activeScheduleDate;
             const blocks = state.scheduleByDate[date] || [];
             state.scheduleByDate[date] = blocks.filter(b => b.id !== blockId);
