@@ -3178,6 +3178,13 @@
             }
         }
 
+        // Expose schedule functions globally so inline onclick handlers can access them
+        window.addScheduleBlock = addScheduleBlock;
+        window.toggleScheduleBlock = toggleScheduleBlock;
+        window.updateScheduleBlockTime = updateScheduleBlockTime;
+        window.updateScheduleBlockText = updateScheduleBlockText;
+        window.deleteScheduleBlock = deleteScheduleBlock;
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
