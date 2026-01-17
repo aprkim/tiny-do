@@ -1195,6 +1195,29 @@
             padding: 0;
         }
 
+        .delete-history-item-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 10px 16px;
+            margin-top: 12px;
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 8px;
+            color: #DC2626;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-history-item-btn:hover {
+            background: #FEE2E2;
+            border-color: #FCA5A5;
+        }
+
         /* ==================== CONFIRMATION MODAL ==================== */
         .modal-overlay {
             position: fixed;
@@ -2869,6 +2892,12 @@
                             </div>
                     <div class="history-tasks-list" style="display: ${isExpanded ? 'block' : 'none'}">
                         ${tasksHtml}
+                        <button class="delete-history-item-btn" onclick="deleteHistoryItem(${index}, event)">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14"/>
+                            </svg>
+                            Delete
+                        </button>
                         </div>
                     </div>
                 `;
@@ -2947,6 +2976,17 @@
         function clearHistory() {
             showConfirmModal('Clear History', 'This will delete all history. This cannot be undone.', () => {
                 state.history = [];
+                saveHistory();
+                loadHistoryView();
+            });
+        }
+
+        function deleteHistoryItem(index, event) {
+            event.stopPropagation();
+            const entry = state.history[index];
+            const dateStr = formatDateShort(entry.date);
+            showConfirmModal('Delete Entry', `Delete history for ${dateStr}?`, () => {
+                state.history.splice(index, 1);
                 saveHistory();
                 loadHistoryView();
             });
@@ -4389,12 +4429,12 @@
 
         // Initialize Umbrella Firebase (tinywins-account) as named instance
         const umbrellaConfig = {
-          apiKey: "AIzaSyBycFP3HfMF7tyshQixvwzoaAE3Df8Fz_8",
+          apiKey: "AIzaSyBF4Dm-N-0rKQfVSnmPamxnZDO-jWlYXZQ",
           authDomain: "tinywins-account.firebaseapp.com",
           projectId: "tinywins-account",
           storageBucket: "tinywins-account.firebasestorage.app",
-          messagingSenderId: "497477643272",
-          appId: "1:497477643272:web:UMBRELLA_APP_ID_HERE"
+          messagingSenderId: "500103077791",
+          appId: "1:500103077791:web:3402c4b9bb0aab89bf27aa"
         };
         const umbrellaApp = firebase.initializeApp(umbrellaConfig, "tinyAccount");
         umbrellaDb = umbrellaApp.firestore();
@@ -4402,6 +4442,8 @@
 
         console.log('✅ Tiny Do Firebase initialized (tiny-wins25)');
         console.log('✅ Umbrella Firebase initialized (tinywins-account)');
+        console.log('🔑 Umbrella API Key:', umbrellaConfig.apiKey);
+        console.log('🔑 Umbrella Project ID:', umbrellaConfig.projectId);
         
         // Enable offline persistence
         db.enablePersistence({ synchronizeTabs: true })
@@ -4736,6 +4778,8 @@
               handleCodeInApp: true
             };
 
+            console.log('📧 Sending sign-in link via umbrellaAuth...');
+            console.log('🔑 Using API key:', umbrellaAuth.app.options.apiKey);
             await umbrellaAuth.sendSignInLinkToEmail(email, actionCodeSettings);
             window.localStorage.setItem('emailForSignIn', email);
             showAlertModal('Check Your Email', `We sent a sign-in link to ${email}. Click the link to continue.`);
