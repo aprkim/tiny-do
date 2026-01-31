@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tiny Spaces</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f7f9f8;
+      color: #1e293b;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .container { width: 100%; max-width: 440px; }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 48px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    @media (max-width: 500px) {
+      .card { padding: 32px 24px; }
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #1e293b;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: #64748b;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 8px;
+      text-align: left;
+    }
+
+    input[type="email"] {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-family: inherit;
+      color: #1e293b;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="email"]:focus {
+      border-color: #BF3143;
+      box-shadow: 0 0 0 3px rgba(191, 49, 67, 0.14);
+    }
+
+    input[type="email"]::placeholder { color: #94a3b8; }
+
+    button {
+      width: 100%;
+      padding: 14px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: inherit;
+      color: #ffffff;
+      background: #BF3143;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.02s;
+      margin-bottom: 12px;
+    }
+
+    button:hover { opacity: 0.92; }
+    button:active { opacity: 0.84; transform: translateY(0.5px); }
+    button:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    button.secondary {
+      background: #f0f4f3;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 0;
+    }
+
+    button.secondary:hover { background: #e8f4ed; opacity: 1; }
+
+    .helper-text {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: -4px;
+    }
+
+    .status {
+      display: none;
+      font-size: 14px;
+      color: #475569;
+      background: rgba(71, 85, 105, 0.08);
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin: 16px 0 0 0;
+      text-align: left;
+      word-break: break-word;
+    }
+
+    .status.active { display: block; }
+
+    .error {
+      color: #BF3143;
+      background: rgba(191, 49, 67, 0.08);
+    }
+
+    .form-container { display: block; }
+    .form-container.hidden { display: none; }
+
+    .success-message { display: none; }
+    .success-message.active { display: block; }
+
+    .success-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .success-subtext {
+      font-size: 16px;
+      color: #64748b;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .fineprint {
+      margin-top: 18px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    a { color: #64748b; text-decoration: underline; text-underline-offset: 3px; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Tiny Spaces</h1>
+      <p class="subtitle">Save and recover your Tiny spaces with email.</p>
+
+      <div class="status" id="statusBox"></div>
+
+      <!-- Sign-in form -->
+      <div class="form-container" id="formContainer">
+        <form id="signInForm">
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@example.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+
+          <button type="submit" id="submitButton">Send magic link</button>
+          <p class="helper-text">No password. No spam.</p>
+        </form>
+
+        <p class="fineprint">
+          Saving to email helps you recover this space later.
+          Sharing still uses sync codes.
+        </p>
+      </div>
+
+      <!-- Success state -->
+<div class="success-message" id="successMessage">
+
+  <p class="success-text">You're signed in.</p>
+  <p class="success-subtext">
+    Your saved Tiny spaces.
+  </p>
+
+  <!-- Saved spaces -->
+  <div id="spacesSection" style="text-align:left; margin-top: 18px;">
+    <div style="display:flex; gap:10px; align-items:center; justify-content:space-between; margin-bottom: 12px;">
+      <div style="font-weight:700; color:#1e293b;">Saved spaces</div>
+      <button
+        class="secondary"
+        id="addTestSpaceBtn"
+        type="button"
+        style="width:auto; padding:10px 14px; border-radius:999px;"
+      >
+        Add test
+      </button>
+    </div>
+
+    <div id="spacesList" style="display:grid; gap:10px;"></div>
+  </div>
+
+  <!-- Sign out -->
+  <button
+    class="secondary"
+    id="signOutButton"
+    type="button"
+    style="margin-top: 16px;"
+  >
+    Sign out
+  </button>
+
+</div>
+
+    </div>
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+<script>
+  // tinywins-account (umbrella) config — same as /spaces
+  const tinyAccountConfig = {
+    apiKey: "AIzaSyBF4Dm-N-0rKQfVSnmPamxnZDO-jWlYXZQ",
+    authDomain: "tinywins-account.firebaseapp.com",
+    projectId: "tinywins-account",
+    appId: "1:500103077791:web:3402c4b9bb0aab89bf27aa"
+  };
+
+  // IMPORTANT: avoid collisions if Tiny Do already uses Firebase for something else
+  const tinyAccountApp = firebase.apps?.find(a => a.name === "tinyAccount")
+    ? firebase.app("tinyAccount")
+    : firebase.initializeApp(tinyAccountConfig, "tinyAccount");
+
+  const tinyAuth = firebase.auth(tinyAccountApp);
+  const tinyDb = firebase.firestore(tinyAccountApp);
+</script>
+
+  
+
+  <!-- Firebase SDKs (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+
+  <script>
+    // =========================
+    // Firebase init (umbrella project: tinywins-account)
+    // =========================
+    const firebaseConfig = {
+      apiKey: "AIzaSyBF4Dm-N-0rKQfVSnmPamxnZDO-jWlYXZQ",
+      authDomain: "tinywins-account.firebaseapp.com",
+      projectId: "tinywins-account",
+      appId: "1:500103077791:web:3402c4b9bb0aab89bf27aa"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+
+    // IMPORTANT: this must match your deployed URL (and be in Firebase Auth authorized domains)
+    const ACTION_URL = "https://tinywins.space/spaces/";
+    const actionCodeSettings = {
+      url: ACTION_URL,
+      handleCodeInApp: true
+    };
+
+    // LocalStorage key (namespaced)
+    const EMAIL_KEY = "tiny_spaces_emailForSignIn";
+
+    // =========================
+    // UI elements
+    // =========================
+    const form = document.getElementById("signInForm");
+    const emailInput = document.getElementById("email");
+    const submitButton = document.getElementById("submitButton");
+    const formContainer = document.getElementById("formContainer");
+    const successMessage = document.getElementById("successMessage");
+    const signOutButton = document.getElementById("signOutButton");
+    const statusBox = document.getElementById("statusBox");
+    const addTestBtn = document.getElementById("addTestSpaceBtn");
+    const spacesListEl = document.getElementById("spacesList");
+
+
+    function showStatus(message, isError = false) {
+      statusBox.textContent = message;
+      statusBox.classList.add("active");
+      statusBox.classList.toggle("error", isError);
+    }
+
+    function hideStatus() {
+      statusBox.classList.remove("active");
+      statusBox.classList.remove("error");
+      statusBox.textContent = "";
+    }
+
+    function showSignedInState() {
+      formContainer.classList.add("hidden");
+      successMessage.classList.add("active");
+      hideStatus();
+    }
+
+    function showSignInForm() {
+      formContainer.classList.remove("hidden");
+      successMessage.classList.remove("active");
+      submitButton.disabled = false;
+      submitButton.textContent = "Send magic link";
+      emailInput.value = "";
+      hideStatus();
+    }
+
+    // =========================
+    // 1) Send magic link
+    // =========================
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideStatus();
+
+      const email = (emailInput.value || "").trim();
+      if (!email) {
+        showStatus("Please enter a valid email address.", true);
+        return;
+      }
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending…";
+
+      try {
+        await auth.sendSignInLinkToEmail(email, actionCodeSettings);
+        window.localStorage.setItem(EMAIL_KEY, email);
+
+        submitButton.disabled = false;
+        submitButton.textContent = "Send magic link";
+        showStatus("Magic link sent. Check your email.");
+      } catch (err) {
+        console.error(err);
+        submitButton.disabled = false;
+        submitButton.textContent = "Send magic link";
+
+        // Common: auth/unauthorized-domain
+        const errorMessage = err?.code ? `${err.message} (${err.code})` : (err?.message || "Could not send link. Please try again.");
+        showStatus(errorMessage, true);
+      }
+    });
+
+    // =========================
+    // 2) Complete sign-in if this page is opened via email link
+    // =========================
+    (async function completeSignInIfLink() {
+      try {
+        if (!auth.isSignInWithEmailLink(window.location.href)) return;
+
+        let email = window.localStorage.getItem(EMAIL_KEY);
+        if (!email) {
+          email = window.prompt("Please confirm your email to sign in:");
+        }
+        if (!email) {
+          showStatus("Email is required to complete sign-in.", true);
+          return;
+        }
+
+        await auth.signInWithEmailLink(email, window.location.href);
+        window.localStorage.removeItem(EMAIL_KEY);
+
+        // Clean URL (prevents re-processing the link on refresh)
+        window.history.replaceState({}, document.title, "/spaces/");
+
+        showSignedInState();
+      } catch (err) {
+        console.error(err);
+        showStatus(err?.message || "Sign-in failed. Please try again.", true);
+      }
+    })();
+
+    // =========================
+    // 3) Show signed-in state if already logged in (same browser)
+    // =========================
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    showSignedInState();
+
+    // Load spaces
+    try {
+      const spaces = await listSpacesForUser(user.uid);
+      renderSpaces(spaces);
+    } catch (e) {
+      console.error("Failed to load spaces:", e);
+      showStatus(e?.message || "Couldn't load saved spaces.", true);
+    }
+
+    // Wire Add test (only once)
+    if (addTestBtn && !addTestBtn.dataset.bound) {
+      addTestBtn.dataset.bound = "true";
+      addTestBtn.addEventListener("click", async () => {
+        try {
+          addTestBtn.disabled = true;
+          await addTestSpace(user.uid);
+          const spaces = await listSpacesForUser(user.uid);
+          renderSpaces(spaces);
+        } catch (e) {
+          console.error("Failed to add test:", e);
+          showStatus(e?.message || "Couldn't add test space.", true);
+        } finally {
+          addTestBtn.disabled = false;
+        }
+      });
+    }
+
+  } else {
+    if (!auth.isSignInWithEmailLink(window.location.href)) {
+      showSignInForm();
+    }
+  }
+});
+
+
+function escapeHtml(str) {
+  return String(str || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function renderSpaces(spaces) {
+  if (!spacesListEl) return;
+
+  if (!spaces || spaces.length === 0) {
+    spacesListEl.innerHTML = `<div style="color:#64748b; font-size:14px;">No saved spaces yet.</div>`;
+    return;
+  }
+
+  spacesListEl.innerHTML = spaces.map(s => `
+    <div style="border:1px solid #e2e8f0; border-radius:12px; padding:12px 14px; background:#fff;">
+      <div style="font-weight:700; color:#1e293b; margin-bottom:4px;">
+        ${escapeHtml(s.label || "Untitled space")}
+      </div>
+      <div style="color:#64748b; font-size:13px;">
+        ${escapeHtml((s.appId || "").toUpperCase())} · ${escapeHtml(s.syncCode || "")}
+      </div>
+    </div>
+  `).join("");
+}
+
+async function listSpacesForUser(uid) {
+  const snap = await db
+    .collection("users")
+    .doc(uid)
+    .collection("spaces")
+    .orderBy("createdAt", "desc")
+    .get();
+
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function addTestSpace(uid) {
+  const docId = "do_test_" + Date.now();
+  await db.collection("users").doc(uid).collection("spaces").doc(docId).set({
+    appId: "do",
+    syncCode: "test-code",
+    label: "Test Space",
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+    
+    // =========================
+    // 4) Sign out
+    // =========================
+    signOutButton.addEventListener("click", async () => {
+      try {
+        await auth.signOut();
+        showSignInForm();
+      } catch (err) {
+        console.error(err);
+        showStatus(err?.message || "Could not sign out.", true);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -3719,19 +3719,19 @@
                 scheduleTextInput.focus();
             });
 
-            // Arrow key navigation between fields
+            // Arrow key navigation between fields (only at cursor boundaries)
             scheduleStartInput.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowRight') {
+                if (e.key === 'ArrowRight' && scheduleStartInput.selectionStart === scheduleStartInput.value.length) {
                     e.preventDefault();
                     scheduleEndInput.focus();
                 }
             });
 
             scheduleEndInput.addEventListener('keydown', (e) => {
-                if (e.key === 'ArrowLeft') {
+                if (e.key === 'ArrowLeft' && scheduleEndInput.selectionStart === 0) {
                     e.preventDefault();
                     scheduleStartInput.focus();
-                } else if (e.key === 'ArrowRight') {
+                } else if (e.key === 'ArrowRight' && scheduleEndInput.selectionStart === scheduleEndInput.value.length) {
                     e.preventDefault();
                     scheduleTextInput.focus();
                 }
@@ -3759,11 +3759,18 @@
             // Auto-format time inputs (add colon automatically)
             function formatTimeInput(input) {
                 input.addEventListener('input', (e) => {
-                    let value = e.target.value.replace(/[^0-9]/g, '');
+                    const cursorPos = e.target.selectionStart;
+                    const oldValue = e.target.value;
+                    let value = oldValue.replace(/[^0-9]/g, '');
                     if (value.length >= 2) {
                         value = value.slice(0, 2) + ':' + value.slice(2, 4);
                     }
-                    e.target.value = value;
+                    if (value !== oldValue) {
+                        e.target.value = value;
+                        // Adjust cursor: if we inserted a colon before the cursor, shift it forward
+                        const newPos = cursorPos <= 2 ? cursorPos : Math.min(cursorPos + (value.length - oldValue.length), value.length);
+                        e.target.setSelectionRange(newPos, newPos);
+                    }
                 });
             }
             formatTimeInput(scheduleStartInput);
