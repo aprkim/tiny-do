@@ -697,6 +697,11 @@
             border-color: #BF3143;
         }
 
+        .schedule-time-input.invalid-time {
+            border-color: #BF3143;
+            background: #FEF2F2;
+        }
+
         .schedule-time-separator {
             color: #BF3143;
             font-weight: 600;
@@ -3096,10 +3101,10 @@
                     <input type="checkbox" class="task-checkbox" ${block.done ? 'checked' : ''}
                            onchange="toggleScheduleBlock(${block.id})">
                     <div class="schedule-time-range">
-                        <input type="text" class="schedule-time-input" value="${block.start}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
+                        <input type="text" class="schedule-time-input${block.start >= block.end ? ' invalid-time' : ''}" value="${block.start}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                                onchange="updateScheduleBlockTime(${block.id}, 'start', this.value)" />
                         <span class="schedule-time-separator">–</span>
-                        <input type="text" class="schedule-time-input" value="${block.end}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
+                        <input type="text" class="schedule-time-input${block.start >= block.end ? ' invalid-time' : ''}" value="${block.end}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                                onchange="updateScheduleBlockTime(${block.id}, 'end', this.value)" />
                     </div>
                     <input type="text" class="schedule-text-input" value="${escapeHtml(block.text)}"
@@ -3193,16 +3198,7 @@
 
             if (!block) return;
 
-            const oldValue = block[field];
             block[field] = value;
-
-            // Validate time range
-            if (block.start >= block.end) {
-                showAlertModal('Invalid Time Range', 'End time must be after start time.');
-                block[field] = oldValue; // Revert
-                renderScheduleList();
-                return;
-            }
 
             saveSchedule();
             renderScheduleList();
