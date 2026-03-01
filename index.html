@@ -2405,7 +2405,8 @@
                         id: Date.now() + Math.random(),
                         text: t.text,
                         completed: false,
-                        isTemplate: false
+                        isTemplate: false,
+                        important: t.important || false
                     }));
                 
                 // Save previous day to history
@@ -2483,7 +2484,8 @@
                 id: Date.now() + index,
                 text: task.text,
                 completed: false,
-                isTemplate: true
+                isTemplate: true,
+                important: task.important || false
             }));
             saveTodayTasks();
         }
@@ -2675,6 +2677,16 @@
 
             // Toggle the importance
             task.important = !task.important;
+
+            // If it's a template task, persist importance to the template
+            if (task.isTemplate) {
+                const templates = state.templates[state.todayMode] || [];
+                const template = templates.find(t => t.text === task.text);
+                if (template) {
+                    template.important = task.important;
+                    saveTemplates();
+                }
+            }
 
             // Remove task from current position
             const taskIndex = state.todayTasks.findIndex(t => t.id === taskId);
