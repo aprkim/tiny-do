@@ -1915,6 +1915,22 @@
                 </div>
                 <div id="scheduleList" class="schedule-list"></div>
             </div>
+
+            <!-- Focus Notes Section -->
+            <div class="task-section" style="margin-top: 24px;">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        Notes
+                    </div>
+                </div>
+                <textarea id="focusNoteArea" placeholder="Free-style notes for today..."
+                    style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 14px; font-family: inherit; color: #334155; background: #FAFBFC; resize: vertical; line-height: 1.6; box-sizing: border-box;"
+                    oninput="saveFocusNote()"></textarea>
+            </div>
         </div>
     </div>
 
@@ -2029,7 +2045,8 @@
             TODAY_DATE: 'tinyWins_todayDate',
             TODAY_MODE_OVERRIDE: 'tinyWins_todayModeOverride',
             HISTORY: 'tinyWins_history',
-            SCHEDULE: 'tinyWins_schedule'
+            SCHEDULE: 'tinyWins_schedule',
+            FOCUS_NOTES: 'tinyWins_focusNotes'
         };
         const STORAGE_KEYS = window.STORAGE_KEYS; // Keep local reference for convenience
 
@@ -2090,6 +2107,7 @@
             },
             history: [],
             scheduleByDate: {},  // { "YYYY-MM-DD": [{ id, start, end, text, done, order }] }
+            focusNotesByDate: {},  // { "YYYY-MM-DD": "note text" }
             activeScheduleDate: ''  // Currently selected date in schedule view
         };
         const state = window.state; // Keep local reference for convenience
@@ -2215,6 +2233,9 @@
 
             // Load schedule data
             loadScheduleFromStorage();
+
+            // Load focus notes
+            loadFocusNotesFromStorage();
         }
 
         // ==================== ONBOARDING ====================
@@ -3082,6 +3103,9 @@
 
             // Render schedule list
             renderScheduleList();
+
+            // Load focus note for this date
+            loadFocusNote();
         }
 
         function updateScheduleDateDisplay(dateString) {
@@ -3286,6 +3310,7 @@
             state.activeScheduleDate = picker.value;
             updateScheduleDateDisplay(picker.value);
             renderScheduleList();
+            loadFocusNote();
         }
 
         function getYesterdayString(dateString) {
@@ -3310,12 +3335,44 @@
             }
         }
 
+        // ==================== FOCUS NOTES ====================
+        function saveFocusNote() {
+            const textarea = document.getElementById('focusNoteArea');
+            if (!textarea) return;
+            const date = state.activeScheduleDate || getTodayString();
+            const text = textarea.value;
+            if (text.trim()) {
+                state.focusNotesByDate[date] = text;
+            } else {
+                delete state.focusNotesByDate[date];
+            }
+            localStorage.setItem(STORAGE_KEYS.FOCUS_NOTES, JSON.stringify(state.focusNotesByDate));
+            if (window.syncToFirebase) {
+                window.syncToFirebase();
+            }
+        }
+
+        function loadFocusNote() {
+            const textarea = document.getElementById('focusNoteArea');
+            if (!textarea) return;
+            const date = state.activeScheduleDate || getTodayString();
+            textarea.value = state.focusNotesByDate[date] || '';
+        }
+
+        function loadFocusNotesFromStorage() {
+            const saved = localStorage.getItem(STORAGE_KEYS.FOCUS_NOTES);
+            if (saved) {
+                state.focusNotesByDate = JSON.parse(saved);
+            }
+        }
+
         // Expose schedule functions globally so inline onclick handlers can access them
         window.addScheduleBlock = addScheduleBlock;
         window.toggleScheduleBlock = toggleScheduleBlock;
         window.updateScheduleBlockTime = updateScheduleBlockTime;
         window.updateScheduleBlockText = updateScheduleBlockText;
         window.deleteScheduleBlock = deleteScheduleBlock;
+        window.saveFocusNote = saveFocusNote;
 
         function escapeHtml(text) {
             const div = document.createElement('div');
@@ -4219,7 +4276,8 @@
             todayMode: state.todayMode,
             todayDate: state.todayDate,
             todayTasks: state.todayTasks,
-            scheduleByDate: state.scheduleByDate
+            scheduleByDate: state.scheduleByDate,
+            focusNotesByDate: state.focusNotesByDate
           };
 
           if (includeHistory) {
@@ -4326,6 +4384,11 @@
           if (importedData.scheduleByDate) {
             window.state.scheduleByDate = importedData.scheduleByDate;
             saveSchedule();
+          }
+
+          if (importedData.focusNotesByDate) {
+            window.state.focusNotesByDate = importedData.focusNotesByDate;
+            localStorage.setItem(window.STORAGE_KEYS.FOCUS_NOTES, JSON.stringify(window.state.focusNotesByDate));
           }
 
           // Update UI
@@ -4588,12 +4651,16 @@
               console.log('📥 Received schedule data for dates:', Object.keys(remoteData.scheduleByDate));
               window.state.scheduleByDate = remoteData.scheduleByDate;
             }
+            if (remoteData.focusNotesByDate) {
+              window.state.focusNotesByDate = remoteData.focusNotesByDate;
+            }
 
             // Save to localStorage to keep it in sync
             localStorage.setItem(STORAGE_KEYS.TODAY_TASKS, JSON.stringify(window.state.todayTasks));
             localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(window.state.templates));
             localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(window.state.history));
             localStorage.setItem(STORAGE_KEYS.SCHEDULE, JSON.stringify(window.state.scheduleByDate));
+            localStorage.setItem(STORAGE_KEYS.FOCUS_NOTES, JSON.stringify(window.state.focusNotesByDate));
 
             // Refresh the current view based on active tab
             const activeTab = window.state.activeTab;
@@ -4602,6 +4669,7 @@
                 updateProgressBar();
             } else if (activeTab === 'schedule') {
                 renderScheduleList();
+                loadFocusNote();
             } else if (activeTab === 'templates') {
                 loadTemplatesView();
             } else if (activeTab === 'history') {
@@ -4663,6 +4731,7 @@
             history: window.state.history,
             todayMode: window.state.todayMode,
             scheduleByDate: window.state.scheduleByDate,
+            focusNotesByDate: window.state.focusNotesByDate,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           };
 
