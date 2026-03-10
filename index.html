@@ -1928,7 +1928,8 @@
                     </div>
                 </div>
                 <textarea id="focusNoteArea" placeholder="Free-style notes for today..."
-                    style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 14px; font-family: inherit; color: #334155; background: #FAFBFC; resize: vertical; line-height: 1.6; box-sizing: border-box;"
+                    style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 14px; font-family: inherit; color: #334155; background: #FAFBFC; resize: vertical; line-height: 1.6; box-sizing: border-box; outline: none;"
+                    onfocus="this.style.borderColor='#CBD5E1'" onblur="this.style.borderColor='#E2E8F0'"
                     oninput="saveFocusNote()"></textarea>
             </div>
         </div>
