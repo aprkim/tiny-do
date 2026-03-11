@@ -1930,7 +1930,10 @@
                 <textarea id="focusNoteArea" placeholder="Free-style notes for today..."
                     style="width: 100%; min-height: 120px; padding: 12px; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 14px; font-family: inherit; color: #334155; background: #FAFBFC; resize: vertical; line-height: 1.6; box-sizing: border-box; outline: none;"
                     onfocus="this.style.borderColor='#CBD5E1'" onblur="this.style.borderColor='#E2E8F0'"
-                    oninput="saveFocusNote()"></textarea>
+                    oninput="onFocusNoteInput()"></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+                    <button id="saveNoteBtn" onclick="saveFocusNote()" style="display: none; padding: 8px 20px; background: #64748B; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer;">Save</button>
+                </div>
             </div>
         </div>
     </div>
@@ -3337,6 +3340,11 @@
         }
 
         // ==================== FOCUS NOTES ====================
+        function onFocusNoteInput() {
+            const btn = document.getElementById('saveNoteBtn');
+            if (btn) btn.style.display = 'inline-block';
+        }
+
         function saveFocusNote() {
             const textarea = document.getElementById('focusNoteArea');
             if (!textarea) return;
@@ -3350,6 +3358,16 @@
             localStorage.setItem(STORAGE_KEYS.FOCUS_NOTES, JSON.stringify(state.focusNotesByDate));
             if (window.syncToFirebase) {
                 window.syncToFirebase();
+            }
+            const btn = document.getElementById('saveNoteBtn');
+            if (btn) {
+                btn.textContent = 'Saved!';
+                btn.style.background = '#94A3B8';
+                setTimeout(() => {
+                    btn.style.display = 'none';
+                    btn.textContent = 'Save';
+                    btn.style.background = '#64748B';
+                }, 1200);
             }
         }
 
@@ -3374,6 +3392,7 @@
         window.updateScheduleBlockText = updateScheduleBlockText;
         window.deleteScheduleBlock = deleteScheduleBlock;
         window.saveFocusNote = saveFocusNote;
+        window.onFocusNoteInput = onFocusNoteInput;
 
         function escapeHtml(text) {
             const div = document.createElement('div');
