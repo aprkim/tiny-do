@@ -310,6 +310,62 @@
             text-decoration: underline;
         }
 
+        /* ==================== TOP BAR ==================== */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+            min-height: 32px;
+        }
+
+        .top-bar .suite-back-link {
+            margin-bottom: 0;
+        }
+
+        .gear-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94A3B8;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .gear-btn:hover {
+            color: #64748b;
+            background-color: #F1F5F9;
+        }
+
+        .gear-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .settings-back-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px 4px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #94A3B8;
+            transition: color 0.2s;
+        }
+
+        .settings-back-btn:hover {
+            color: #64748b;
+            text-decoration: underline;
+        }
+
         /* ==================== HEADER ==================== */
         .header {
             background: white;
@@ -617,11 +673,123 @@
             display: block;
         }
 
+        .task-move-later {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0 10px 0 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94A3B8;
+            transition: color 0.2s, transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .task-move-later:hover {
+            color: #64748B;
+            transform: scale(1.15);
+        }
+
+        .task-move-later svg {
+            display: block;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
         .empty-message {
             text-align: center;
             color: #94A3B8;
             padding: 40px 20px;
             font-size: 15px;
+        }
+
+        /* ==================== TOAST ==================== */
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 86px;
+            transform: translateX(-50%) translateY(16px);
+            background: #334155;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            z-index: 200;
+            max-width: calc(100% - 40px);
+            text-align: center;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ==================== LATER ==================== */
+        .later-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: #FAFAF8;
+            border: 2px solid #EAE7E0;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .later-item:hover {
+            background: #F5F3EF;
+        }
+
+        .later-item.completed {
+            opacity: 0.5;
+        }
+
+        .later-item.completed .later-item-text {
+            text-decoration: line-through;
+            color: #94A3B8;
+        }
+
+        .later-item-text {
+            flex: 1;
+            font-size: 15px;
+            color: #334155;
+            word-break: break-word;
+        }
+
+        .later-item-delete {
+            background: none;
+            border: none;
+            padding: 6px;
+            margin-left: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #CBD5E1;
+            flex-shrink: 0;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .later-item-delete:hover {
+            color: #BF3143;
+            background-color: #FEF2F2;
+        }
+
+        .later-item-delete svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
         }
 
         /* ==================== SCHEDULE ==================== */
@@ -1615,7 +1783,15 @@
     <!-- ==================== TODAY VIEW ==================== -->
     <div id="view-today" class="view">
         <div class="container">
-            <a href="https://tinywins.space" class="suite-back-link">← TinyWins</a>
+            <div class="top-bar">
+                <a href="https://tinywins.space" class="suite-back-link">← TinyWins</a>
+                <button class="gear-btn" onclick="openSettings()" aria-label="Settings" title="Settings">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 3.09V3a2 2 0 1 1 4 0v.09c0 .69.4 1.3 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c.21.6.82 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
             <div class="header">
                 <button class="header-refresh-btn" id="todayRefreshBtn" title="Refresh tasks">
                     <svg viewBox="0 0 24 24">
@@ -1689,6 +1865,15 @@
     <!-- ==================== TEMPLATES VIEW ==================== -->
     <div id="view-templates" class="view">
         <div class="container">
+            <div class="top-bar">
+                <a href="https://tinywins.space" class="suite-back-link">← TinyWins</a>
+                <button class="gear-btn" onclick="openSettings()" aria-label="Settings" title="Settings">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 3.09V3a2 2 0 1 1 4 0v.09c0 .69.4 1.3 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c.21.6.82 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
             <div class="header">
                 <div class="header-title">Templates</div>
                 <div class="header-date">Customize your daily routines</div>
@@ -1735,6 +1920,15 @@
     <!-- ==================== HISTORY VIEW ==================== -->
     <div id="view-history" class="view">
         <div class="container">
+            <div class="top-bar">
+                <a href="https://tinywins.space" class="suite-back-link">← TinyWins</a>
+                <button class="gear-btn" onclick="openSettings()" aria-label="Settings" title="Settings">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 3.09V3a2 2 0 1 1 4 0v.09c0 .69.4 1.3 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c.21.6.82 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
             <div class="header">
                 <div class="header-title">History</div>
                 <div class="header-date">Your past performance</div>
@@ -1752,9 +1946,61 @@
             </div>
         </div>
 
+    <!-- ==================== LATER VIEW ==================== -->
+    <div id="view-later" class="view">
+        <div class="container">
+            <div class="top-bar">
+                <a href="https://tinywins.space" class="suite-back-link">← TinyWins</a>
+                <button class="gear-btn" onclick="openSettings()" aria-label="Settings" title="Settings">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 3.09V3a2 2 0 1 1 4 0v.09c0 .69.4 1.3 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c.21.6.82 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="header">
+                <div class="header-title">Later</div>
+                <div class="header-date">Things to do someday — not today</div>
+            </div>
+
+            <div class="task-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+                            <path d="M4 13h4l2 3h4l2-3h4M4 13V6a2 2 0 012-2h12a2 2 0 012 2v7m-16 0v5a2 2 0 002 2h12a2 2 0 002-2v-5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Someday List
+                    </div>
+                    <button class="clear-all-btn" id="clearDoneLaterBtn" onclick="clearCompletedLaterTasks()">Clear Done</button>
+                </div>
+                <div class="task-list" id="laterTaskList"></div>
+            </div>
+
+            <div class="add-task-section">
+                <div class="section-title" style="margin-bottom: 12px;">
+                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="#64748B" stroke-width="2" fill="none">
+                        <path d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Add to Later
+                </div>
+                <div class="add-task-row">
+                    <input type="text" class="add-task-input" id="laterTaskInput" placeholder="Something for the months ahead..." maxlength="200">
+                    <button class="add-task-btn" id="laterAddBtn" disabled>Add</button>
+                </div>
+            </div>
+
+            <div class="footer">
+                These never carry over to Today — they just wait here.
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== SETTINGS VIEW ==================== -->
     <div id="view-settings" class="view">
         <div class="container">
+            <div class="top-bar">
+                <button class="settings-back-btn" onclick="closeSettings()">← Back</button>
+            </div>
             <div class="header">
                 <div class="header-title">Settings</div>
                 <div class="header-date">Manage sync and preferences</div>
@@ -1878,7 +2124,15 @@
     <!-- ==================== SCHEDULE VIEW ==================== -->
     <div id="view-schedule" class="view">
         <div class="container">
-            <a href="https://tinywins.space" class="suite-back-link">← TinyWins</a>
+            <div class="top-bar">
+                <a href="https://tinywins.space" class="suite-back-link">← TinyWins</a>
+                <button class="gear-btn" onclick="openSettings()" aria-label="Settings" title="Settings">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 3.09V3a2 2 0 1 1 4 0v.09c0 .69.4 1.3 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c.21.6.82 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
             <div class="header">
                 <div class="header-title">Today's Focus</div>
                 <div class="header-date" id="scheduleHeaderDate" style="font-size: 16px; color: #64748B; cursor: pointer;">
@@ -1938,6 +2192,9 @@
         </div>
     </div>
 
+    <!-- ==================== TOAST ==================== -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
     <!-- ==================== BOTTOM NAVIGATION ==================== -->
     <nav class="bottom-nav hidden" id="bottomNav">
         <button class="nav-tab active" data-tab="today">
@@ -1945,6 +2202,12 @@
                 <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
             </svg>
             <span>Today</span>
+        </button>
+        <button class="nav-tab" data-tab="later">
+            <svg viewBox="0 0 24 24">
+                <path d="M4 13h4l2 3h4l2-3h4M4 13V6a2 2 0 012-2h12a2 2 0 012 2v7m-16 0v5a2 2 0 002 2h12a2 2 0 002-2v-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Later</span>
         </button>
         <button class="nav-tab" data-tab="schedule">
             <svg viewBox="0 0 24 24">
@@ -1963,13 +2226,6 @@
                 <path d="M4 5a1 1 0 011-1h4a1 1 0 011 1v5H4V5zm0 7h6v7a1 1 0 01-1 1H5a1 1 0 01-1-1v-7zm10-7a1 1 0 011-1h4a1 1 0 011 1v5h-6V5zm0 7h6v7a1 1 0 01-1 1h-4a1 1 0 01-1-1v-7z"/>
             </svg>
             <span>Templates</span>
-        </button>
-        <button class="nav-tab" data-tab="settings">
-            <svg viewBox="0 0 24 24">
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 3.09V3a2 2 0 1 1 4 0v.09c0 .69.4 1.3 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09c.21.6.82 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Settings</span>
         </button>
     </nav>
 
@@ -2050,7 +2306,8 @@
             TODAY_MODE_OVERRIDE: 'tinyWins_todayModeOverride',
             HISTORY: 'tinyWins_history',
             SCHEDULE: 'tinyWins_schedule',
-            FOCUS_NOTES: 'tinyWins_focusNotes'
+            FOCUS_NOTES: 'tinyWins_focusNotes',
+            LATER_TASKS: 'tinyWins_laterTasks'
         };
         const STORAGE_KEYS = window.STORAGE_KEYS; // Keep local reference for convenience
 
@@ -2112,7 +2369,9 @@
             history: [],
             scheduleByDate: {},  // { "YYYY-MM-DD": [{ id, start, end, text, done, order }] }
             focusNotesByDate: {},  // { "YYYY-MM-DD": "note text" }
-            activeScheduleDate: ''  // Currently selected date in schedule view
+            activeScheduleDate: '',  // Currently selected date in schedule view
+            laterTasks: [],  // [{ id, text, completed }] — long-term, never carried into Today
+            settingsReturnTab: 'today'  // Tab to return to when leaving Settings
         };
         const state = window.state; // Keep local reference for convenience
 
@@ -2240,6 +2499,9 @@
 
             // Load focus notes
             loadFocusNotesFromStorage();
+
+            // Load later (someday) tasks
+            loadLaterFromStorage();
         }
 
         // ==================== ONBOARDING ====================
@@ -2577,6 +2839,20 @@
             else if (tabName === 'schedule') loadScheduleView();
             else if (tabName === 'templates') loadTemplatesView();
             else if (tabName === 'history') loadHistoryView();
+            else if (tabName === 'later') loadLaterView();
+        }
+
+        // Settings lives behind the gear icon rather than the bottom nav,
+        // so remember where the user came from to send them back.
+        function openSettings() {
+            if (state.activeTab !== 'settings') {
+                state.settingsReturnTab = state.activeTab;
+            }
+            switchTab('settings');
+        }
+
+        function closeSettings() {
+            switchTab(state.settingsReturnTab || 'today');
         }
 
         function renderBottomNav() {
@@ -2614,6 +2890,12 @@
                         <button class="task-star-toggle" onclick="toggleTaskImportance(${task.id})" aria-label="${task.important ? 'Remove importance' : 'Mark as important'}" title="${task.important ? 'Remove importance' : 'Mark as important'}">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="${task.important ? '#BF3143' : 'none'}" stroke="${task.important ? '#BF3143' : '#94A3B8'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </button>
+                        <button class="task-move-later" onclick="moveTaskToLater('${task.id}')" aria-label="Move to Later" title="Move to Later">
+                            <svg viewBox="0 0 24 24" width="15" height="15" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3v7m0 0L9.5 7.5M12 10l2.5-2.5"/>
+                                <path d="M4 14h4l2 2h4l2-2h4M4 14v4a2 2 0 002 2h12a2 2 0 002-2v-4"/>
                             </svg>
                         </button>
                     ` : ''}
@@ -3091,6 +3373,144 @@
                     document.body.appendChild(confetti);
                     setTimeout(() => confetti.remove(), 3000);
                 }, i * 30);
+            }
+        }
+
+        // ==================== TOAST ====================
+        let toastTimer = null;
+
+        function showToast(message) {
+            const el = document.getElementById('toast');
+            if (!el) return;
+
+            el.textContent = message;
+            el.classList.add('show');
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+        }
+
+        // ==================== LATER VIEW ====================
+        function loadLaterView() {
+            renderLaterList();
+        }
+
+        function renderLaterList() {
+            const list = document.getElementById('laterTaskList');
+            const clearBtn = document.getElementById('clearDoneLaterBtn');
+            const tasks = state.laterTasks || [];
+
+            clearBtn.style.display = tasks.some(t => t.completed) ? 'block' : 'none';
+
+            if (tasks.length === 0) {
+                list.innerHTML = '<div class="empty-message">Nothing here yet. Park anything that isn\'t for today.</div>';
+                return;
+            }
+
+            // Unfinished items first, finished ones settle to the bottom
+            const ordered = [...tasks.filter(t => !t.completed), ...tasks.filter(t => t.completed)];
+
+            list.innerHTML = ordered.map(task => `
+                <div class="later-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleLaterTask('${task.id}')">
+                    <span class="later-item-text">${escapeHtml(task.text)}</span>
+                    <button class="later-item-delete" onclick="deleteLaterTask('${task.id}')" aria-label="Delete" title="Delete">
+                        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function addLaterTask() {
+            const input = document.getElementById('laterTaskInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            state.laterTasks.push({
+                id: String(Date.now()),
+                text: text,
+                completed: false
+            });
+
+            input.value = '';
+            document.getElementById('laterAddBtn').disabled = true;
+
+            saveLaterTasks();
+            renderLaterList();
+        }
+
+        function toggleLaterTask(taskId) {
+            const task = state.laterTasks.find(t => String(t.id) === String(taskId));
+            if (!task) return;
+
+            task.completed = !task.completed;
+            saveLaterTasks();
+            renderLaterList();
+        }
+
+        function deleteLaterTask(taskId) {
+            const index = state.laterTasks.findIndex(t => String(t.id) === String(taskId));
+            if (index === -1) return;
+
+            state.laterTasks.splice(index, 1);
+            saveLaterTasks();
+            renderLaterList();
+        }
+
+        function clearCompletedLaterTasks() {
+            const doneCount = state.laterTasks.filter(t => t.completed).length;
+            if (doneCount === 0) return;
+
+            showConfirmModal(
+                'Clear Done',
+                `Remove ${doneCount} completed item${doneCount === 1 ? '' : 's'} from Later?`,
+                () => {
+                    state.laterTasks = state.laterTasks.filter(t => !t.completed);
+                    saveLaterTasks();
+                    renderLaterList();
+                }
+            );
+        }
+
+        // Sweep a one-time task off Today and park it in Later.
+        // Routine tasks are owned by their template, so they're not eligible.
+        function moveTaskToLater(taskId) {
+            const index = state.todayTasks.findIndex(t => String(t.id) === String(taskId));
+            if (index === -1) return;
+
+            const task = state.todayTasks[index];
+            if (task.isTemplate) return;
+
+            state.todayTasks.splice(index, 1);
+            state.laterTasks.push({
+                id: String(Date.now()),
+                text: task.text,
+                completed: false
+            });
+
+            saveTodayTasks();
+            saveLaterTasks();
+            renderTodayTasks();
+            updateProgressBar();
+            showToast('Moved to Later');
+        }
+
+        function saveLaterTasks() {
+            localStorage.setItem(STORAGE_KEYS.LATER_TASKS, JSON.stringify(state.laterTasks));
+            // Trigger Firebase sync if available
+            if (window.syncToFirebase) {
+                window.syncToFirebase();
+            }
+        }
+
+        function loadLaterFromStorage() {
+            const saved = localStorage.getItem(STORAGE_KEYS.LATER_TASKS);
+            if (saved) {
+                try {
+                    state.laterTasks = JSON.parse(saved) || [];
+                } catch (e) {
+                    state.laterTasks = [];
+                }
             }
         }
 
@@ -3780,6 +4200,18 @@
                 tab.addEventListener('click', () => switchTemplateMode(tab.dataset.mode));
             });
 
+            // Later tab
+            const laterInput = document.getElementById('laterTaskInput');
+            const laterBtn = document.getElementById('laterAddBtn');
+
+            laterInput.addEventListener('input', () => {
+                laterBtn.disabled = !laterInput.value.trim();
+            });
+            laterInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && laterInput.value.trim()) addLaterTask();
+            });
+            laterBtn.addEventListener('click', addLaterTask);
+
             // Schedule tab
             const scheduleStartInput = document.getElementById('scheduleStartTime');
             const scheduleEndInput = document.getElementById('scheduleEndTime');
@@ -4147,6 +4579,7 @@
         state.templates = { weekday: [], weekend: [], holiday: [] };
         state.history = [];
         state.todayMode = 'weekday';
+        state.laterTasks = [];
 
         // Clear localStorage (but keep sync code)
         localStorage.removeItem(STORAGE_KEYS.TODAY_TASKS);
@@ -4155,11 +4588,13 @@
         localStorage.removeItem(STORAGE_KEYS.TODAY_MODE);
         localStorage.removeItem(STORAGE_KEYS.TODAY_DATE);
         localStorage.removeItem(STORAGE_KEYS.TODAY_MODE_OVERRIDE);
+        localStorage.removeItem(STORAGE_KEYS.LATER_TASKS);
 
         // Update UI
         renderTodayTasks();
         loadTemplatesView();
         loadHistoryView();
+        renderLaterList();
         updateProgressBar();
         updateDataManagementState();
 
@@ -4674,6 +5109,9 @@
             if (remoteData.focusNotesByDate) {
               window.state.focusNotesByDate = remoteData.focusNotesByDate;
             }
+            if (remoteData.laterTasks) {
+              window.state.laterTasks = remoteData.laterTasks;
+            }
 
             // Save to localStorage to keep it in sync
             localStorage.setItem(STORAGE_KEYS.TODAY_TASKS, JSON.stringify(window.state.todayTasks));
@@ -4681,6 +5119,7 @@
             localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(window.state.history));
             localStorage.setItem(STORAGE_KEYS.SCHEDULE, JSON.stringify(window.state.scheduleByDate));
             localStorage.setItem(STORAGE_KEYS.FOCUS_NOTES, JSON.stringify(window.state.focusNotesByDate));
+            localStorage.setItem(STORAGE_KEYS.LATER_TASKS, JSON.stringify(window.state.laterTasks));
 
             // Refresh the current view based on active tab
             const activeTab = window.state.activeTab;
@@ -4694,6 +5133,8 @@
                 loadTemplatesView();
             } else if (activeTab === 'history') {
                 loadHistoryView();
+            } else if (activeTab === 'later') {
+                renderLaterList();
             }
 
             console.log(isFirstLoad ? '✅ Loaded from Firestore' : '✅ Synced from another device');
@@ -4752,6 +5193,7 @@
             todayMode: window.state.todayMode,
             scheduleByDate: window.state.scheduleByDate,
             focusNotesByDate: window.state.focusNotesByDate,
+            laterTasks: window.state.laterTasks,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           };
 
@@ -4799,12 +5241,14 @@
               if (remoteData.history) window.state.history = remoteData.history;
               if (remoteData.todayMode) window.state.todayMode = remoteData.todayMode;
               if (remoteData.scheduleByDate) window.state.scheduleByDate = remoteData.scheduleByDate;
+              if (remoteData.laterTasks) window.state.laterTasks = remoteData.laterTasks;
 
               // Save to localStorage
               localStorage.setItem(STORAGE_KEYS.TODAY_TASKS, JSON.stringify(window.state.todayTasks));
               localStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(window.state.templates));
               localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(window.state.history));
               localStorage.setItem(STORAGE_KEYS.SCHEDULE, JSON.stringify(window.state.scheduleByDate));
+              localStorage.setItem(STORAGE_KEYS.LATER_TASKS, JSON.stringify(window.state.laterTasks));
             }
           } else {
             // Not synced, just reload from localStorage

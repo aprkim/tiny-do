@@ -10,18 +10,35 @@ Tiny Do is a minimalist daily task management app designed to help you build con
 
 ## ✨ Features
 
-### Three-Tab Navigation
+### Five-Tab Navigation
 
 - **📅 Today** - Your daily task list with progress tracking
-- **📋 Templates** - Customize routines for Weekday, Weekend, and Special Day
+- **📥 Later** - Long-term "someday" items that never touch Today
+- **🗓️ Focus** - Time blocks and free-form notes for a chosen date
 - **📜 History** - View past performance and completion rates
+- **📋 Templates** - Customize routines for Weekday, Weekend, and Special Day
 
-### Two Types of Tasks
+**Settings** lives behind the ⚙️ gear in the top-right corner of every view, keeping the bottom nav for the things you use daily.
+
+### Three Types of Tasks
 
 | Task Type | Visual Style | Behavior |
 |-----------|--------------|----------|
 | **Routine Tasks** | Warm beige background | From templates, resets daily - perfect for habits |
 | **One-Time Tasks** | Light blue background with border | Added on-the-fly, carries over until completed |
+| **Later Tasks** | Soft sand background, own tab | Long-term items. Never carry into Today, never counted in progress |
+
+### Later (Someday List)
+
+A parking lot for things you need to do in the *next months*, not today — renew a passport, replace the laptop, sort the garage.
+
+- Lives in its own tab, so it never clutters Today
+- Items stay put until you check them off or delete them
+- Completed items sink to the bottom; **Clear Done** removes them in one go
+- Excluded from the Today progress bar, so it can't dilute your daily completion rate
+- Syncs across devices along with everything else
+
+**Move to Later** — every one-time task on Today has a small tray icon next to its star. Tap it to sweep the task off Today and into Later without retyping it. Routine tasks don't get the button, since they belong to their template.
 
 ### Smart Template System
 
@@ -115,6 +132,9 @@ All data is stored locally in your browser using these keys:
 - `tinyWins_todayMode` - Current day mode (weekday/weekend/holiday)
 - `tinyWins_todayModeOverride` - Manual template selection (per-date override)
 - `tinyWins_history` - Past 30 days of completion data
+- `tinyWins_laterTasks` - Your long-term "Later" list
+- `tinyWins_schedule` - Focus time blocks by date
+- `tinyWins_focusNotes` - Focus notes by date
 - `tinyWins_lastActiveTab` - Remembers your last active tab
 - `tinyWins_setupComplete` - Onboarding completion flag
 
@@ -126,6 +146,9 @@ Tiny Do is built on the belief that **consistent small actions lead to significa
 
 ## 🔄 Recent Updates
 
+- **Later Tab** - A someday list for long-term items, kept out of Today
+- **Move to Later** - Sweep a one-time task off Today with one tap
+- **Settings Behind the Gear** - Moved out of the bottom nav to keep it to five daily tabs
 - **Manual Template Selection** - Click the day mode pill to choose any template for today
 - **Color-Matched Modal** - Template selector with pill-themed design
 - **Three-Tab Interface** - Streamlined navigation (Today, Templates, History)
