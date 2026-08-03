@@ -18,5 +18,17 @@ service cloud.firestore {
     match /tinyWins/{syncCode} {
       allow get, write: if request.auth != null;
     }
+
+    // Tiny Cards metadata (sender, recipient, occasion, date, page paths).
+    // The images themselves live in Cloud Storage under cards/{syncCode}/…;
+    // this document is what tells the archive which paths exist, because the
+    // Storage rules deny `list` outright.
+    //
+    // NOTE: Firestore rules are project-wide, so this file is the single
+    // source of truth for tiny-wins25 and is deployed from the tiny-do repo.
+    // Deploying rules from another repo would overwrite these.
+    match /tinyCards/{syncCode} {
+      allow get, write: if request.auth != null;
+    }
   }
 }
