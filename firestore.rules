@@ -1,10 +1,22 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated users to access data by sync code
-    // Sync codes act as shared keys for cross-device access
+
+    // Data is addressed by sync code, which acts as a shared key for
+    // cross-device access. The code IS the secret, so the rules must make
+    // sure codes cannot be discovered.
+    //
+    // Deliberately `get` and not `read`: in Firestore, `read` means
+    // `get` + `list`, and granting `list` here let any anonymous user run
+    // db.collection('tinyWins').get() and receive every document — with the
+    // sync codes as the document IDs. That handed out every space's data,
+    // and `write` meant they could overwrite it too.
+    //
+    // `get` still allows the only access pattern the apps actually use,
+    // collection('tinyWins').doc(syncCode), while collection-wide queries
+    // are now denied.
     match /tinyWins/{syncCode} {
-      allow read, write: if request.auth != null;
+      allow get, write: if request.auth != null;
     }
   }
 }
