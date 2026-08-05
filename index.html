@@ -876,6 +876,20 @@
             padding: 0 2px;
         }
 
+        /* Marks a block that runs past midnight, so "22:00 – 06:00" does not
+           read as a mistake */
+        .nextday {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748B;
+            background: #E2E8F0;
+            border-radius: 4px;
+            padding: 1px 4px;
+            margin-left: 2px;
+            align-self: center;
+            white-space: nowrap;
+        }
+
         .schedule-text-input {
             flex: 1;
             font-size: 15px;
@@ -3561,11 +3575,12 @@
                     <input type="checkbox" class="task-checkbox" ${block.done ? 'checked' : ''}
                            onchange="toggleScheduleBlock(${block.id})">
                     <div class="schedule-time-range">
-                        <input type="text" class="schedule-time-input${block.start >= block.end ? ' invalid-time' : ''}" value="${block.start}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
+                        <input type="text" class="schedule-time-input${block.start === block.end ? ' invalid-time' : ''}" value="${block.start}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                                onchange="updateScheduleBlockTime(${block.id}, 'start', this.value)" />
                         <span class="schedule-time-separator">–</span>
-                        <input type="text" class="schedule-time-input${block.start >= block.end ? ' invalid-time' : ''}" value="${block.end}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
+                        <input type="text" class="schedule-time-input${block.start === block.end ? ' invalid-time' : ''}" value="${block.end}" maxlength="5" pattern="[0-2][0-9]:[0-5][0-9]"
                                onchange="updateScheduleBlockTime(${block.id}, 'end', this.value)" />
+                        ${block.end < block.start ? '<span class="nextday" title="Ends the next day">+1</span>' : ''}
                     </div>
                     <input type="text" class="schedule-text-input" value="${escapeHtml(block.text)}"
                            onchange="updateScheduleBlockText(${block.id}, this.value)"
@@ -3652,10 +3667,19 @@
         // a range running backwards. When an end time lands before the start and
         // reading it as PM fixes that, take the PM reading. Only hours under 12
         // are ambiguous — 13:00 already says what it means.
+        //
+        // An end before the start is now legal (it runs past midnight), so the
+        // PM reading is tried FIRST: 12:00–01:00 is far more likely to be a one
+        // hour afternoon block than a thirteen hour overnight one. Anything the
+        // PM reading cannot resolve, such as 22:00–06:00, stays overnight.
+        //
         // The resolved value is written back into the field, so the shift is
         // visible and can be corrected rather than silently applied.
         function resolvePmEnd(start, end) {
-            if (!start || !end || end > start) return end;
+            // `>=` not `>`: an end equal to the start is a typo, and shifting it
+            // to PM would quietly turn 10:00–10:00 into a 12 hour block instead
+            // of being rejected.
+            if (!start || !end || end >= start) return end;
             const eh = parseInt(end.slice(0, 2), 10);
             if (isNaN(eh) || eh >= 12) return end;
             const shifted = String(eh + 12).padStart(2, '0') + end.slice(2);
@@ -3683,13 +3707,14 @@
                 return;
             }
 
-            // "12:00 to 01:00" means noon until 1pm
+            // "12:00 to 01:00" means noon until 1pm. Anything still ending
+            // before it starts is taken as running past midnight.
             end = resolvePmEnd(start, end);
             startInput.value = start;
             endInput.value = end;
 
-            if (start >= end) {
-                showAlertModal('Invalid Time Range', 'End time must be after start time.');
+            if (start === end) {
+                showAlertModal('Invalid Time Range', 'Start and end time cannot be the same.');
                 return;
             }
 
