@@ -3584,6 +3584,17 @@
             scheduleContainer.removeEventListener('touchend', handleScheduleDeleteClick);
             scheduleContainer.addEventListener('click', handleScheduleDeleteClick);
             scheduleContainer.addEventListener('touchend', handleScheduleDeleteClick);
+
+            // The block rows are re-rendered constantly, so the colon formatting
+            // is delegated rather than bound to each input
+            scheduleContainer.removeEventListener('input', handleScheduleTimeInput);
+            scheduleContainer.addEventListener('input', handleScheduleTimeInput);
+        }
+
+        function handleScheduleTimeInput(e) {
+            const el = e.target.closest('.schedule-time-input');
+            if (!el) return;
+            maskTimeInput(el, !!(e.inputType && e.inputType.indexOf('delete') === 0));
         }
 
         function handleScheduleDeleteClick(e) {
@@ -3592,6 +3603,49 @@
                 const blockId = parseInt(deleteBtn.getAttribute('data-block-id'));
                 deleteScheduleBlock(blockId);
             }
+        }
+
+        // ==================== TIME INPUT HELPERS ====================
+        // Shared by "Plan Your Focus" and the inline edits on each block, which
+        // previously had no formatting at all — typing 1020 there stored "1020".
+
+        // Inserts the colon as you type. The cursor is recomputed from how many
+        // DIGITS precede it rather than its old index, because an index-based
+        // adjustment left it before the inserted colon and every later digit
+        // landed one position too early (1030 became 10:03).
+        function maskTimeInput(el, deleting) {
+            const oldValue = el.value;
+            let caret = 0;
+            try { caret = el.selectionStart; } catch (e) { caret = oldValue.length; }
+            const digitsBeforeCursor = oldValue.slice(0, caret).replace(/[^0-9]/g, '').length;
+
+            const digits = oldValue.replace(/[^0-9]/g, '').slice(0, 4);
+            let value = digits;
+            // Don't re-add the colon while deleting, or "10:" could never be cleared
+            if (digits.length > 2 || (digits.length === 2 && !deleting)) {
+                value = digits.slice(0, 2) + ':' + digits.slice(2);
+            }
+            if (value === oldValue) return;
+
+            el.value = value;
+            let newPos = digitsBeforeCursor < 2 ? digitsBeforeCursor : digitsBeforeCursor + 1;
+            newPos = Math.min(newPos, value.length);
+            try { el.setSelectionRange(newPos, newPos); } catch (e) {}
+        }
+
+        // "1020" -> "10:20", "930" -> "09:30", "9" -> "09:00".
+        // Returns null when it cannot be read as a real time.
+        function normalizeTime(str) {
+            const digits = String(str == null ? '' : str).replace(/[^0-9]/g, '');
+            if (!digits.length || digits.length > 4) return null;
+
+            let h, m;
+            if (digits.length <= 2) { h = parseInt(digits, 10); m = 0; }
+            else { h = parseInt(digits.slice(0, digits.length - 2), 10);
+                   m = parseInt(digits.slice(-2), 10); }
+
+            if (isNaN(h) || isNaN(m) || h > 23 || m > 59) return null;
+            return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
         }
 
         function addScheduleBlock() {
@@ -3658,7 +3712,16 @@
 
             if (!block) return;
 
-            block[field] = value;
+            // Accept what was typed rather than storing it verbatim: "1020"
+            // used to be saved as-is and then displayed as 1020.
+            const normalized = normalizeTime(value);
+            if (!normalized) {
+                showAlertModal('Invalid Time', 'Enter a time like 10:20.');
+                renderScheduleList();   // put the previous value back
+                return;
+            }
+
+            block[field] = normalized;
 
             saveSchedule();
             renderScheduleList();
@@ -3756,6 +3819,27 @@
             const saved = localStorage.getItem(STORAGE_KEYS.SCHEDULE);
             if (saved) {
                 state.scheduleByDate = JSON.parse(saved);
+                repairScheduleTimes();
+            }
+        }
+
+        // Blocks saved before the inline editor formatted its input hold raw
+        // digits like "1020". Put those right once, so old entries display and
+        // sort correctly instead of waiting to be edited again.
+        function repairScheduleTimes() {
+            let changed = false;
+            Object.keys(state.scheduleByDate || {}).forEach(date => {
+                (state.scheduleByDate[date] || []).forEach(block => {
+                    ['start', 'end'].forEach(field => {
+                        const raw = block[field];
+                        if (typeof raw !== 'string' || /^\d{2}:\d{2}$/.test(raw)) return;
+                        const fixed = normalizeTime(raw);
+                        if (fixed && fixed !== raw) { block[field] = fixed; changed = true; }
+                    });
+                });
+            });
+            if (changed) {
+                localStorage.setItem(STORAGE_KEYS.SCHEDULE, JSON.stringify(state.scheduleByDate));
             }
         }
 
@@ -4273,36 +4357,18 @@
 
             scheduleAddBtn.addEventListener('click', addScheduleBlock);
 
-            // Auto-format time inputs (add colon automatically).
-            // The cursor is recomputed from how many DIGITS precede it, not from
-            // its old index — an index-based adjustment left the cursor sitting
-            // before the auto-inserted colon, so typing 1,0,3,0 came out "10:03":
-            // the third digit landed in front of the colon and the fourth in
-            // front of the third.
+            // Auto-format time inputs, using the same helper as the inline
+            // edits on each block so the two cannot drift apart
             function formatTimeInput(input) {
                 input.addEventListener('input', (e) => {
-                    // On deletion, don't re-insert the colon at exactly 2 digits,
-                    // otherwise backspacing "10:" restores it and it can never be removed
-                    const deleting = e.inputType && e.inputType.indexOf('delete') === 0;
-                    const oldValue = e.target.value;
-                    const digitsBeforeCursor = oldValue
-                        .slice(0, e.target.selectionStart)
-                        .replace(/[^0-9]/g, '').length;
-
-                    const digits = oldValue.replace(/[^0-9]/g, '').slice(0, 4);
-                    let value = digits;
-                    if (digits.length > 2 || (digits.length === 2 && !deleting)) {
-                        value = digits.slice(0, 2) + ':' + digits.slice(2);
-                    }
-
-                    if (value !== oldValue) {
-                        e.target.value = value;
-                        // Land after the colon once two digits precede the cursor,
-                        // so the next keystroke goes into the minutes
-                        let newPos = digitsBeforeCursor < 2 ? digitsBeforeCursor : digitsBeforeCursor + 1;
-                        newPos = Math.min(newPos, value.length);
-                        e.target.setSelectionRange(newPos, newPos);
-                    }
+                    maskTimeInput(e.target,
+                        !!(e.inputType && e.inputType.indexOf('delete') === 0));
+                });
+                // Tidy a partial entry ("9", "10:") into a real time on the way out
+                input.addEventListener('blur', () => {
+                    if (!input.value.trim()) return;
+                    const t = normalizeTime(input.value);
+                    if (t) input.value = t;
                 });
             }
             formatTimeInput(scheduleStartInput);
