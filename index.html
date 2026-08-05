@@ -3648,21 +3648,45 @@
             return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
         }
 
+        // People type 12-hour times: "12:00 to 01:00" means noon until 1pm, not
+        // a range running backwards. When an end time lands before the start and
+        // reading it as PM fixes that, take the PM reading. Only hours under 12
+        // are ambiguous — 13:00 already says what it means.
+        // The resolved value is written back into the field, so the shift is
+        // visible and can be corrected rather than silently applied.
+        function resolvePmEnd(start, end) {
+            if (!start || !end || end > start) return end;
+            const eh = parseInt(end.slice(0, 2), 10);
+            if (isNaN(eh) || eh >= 12) return end;
+            const shifted = String(eh + 12).padStart(2, '0') + end.slice(2);
+            return shifted > start ? shifted : end;
+        }
+
         function addScheduleBlock() {
             const startInput = document.getElementById('scheduleStartTime');
             const endInput = document.getElementById('scheduleEndTime');
             const taskInput = document.getElementById('scheduleTaskInput');
 
-            const start = startInput.value.trim();
-            const end = endInput.value.trim();
+            const rawStart = startInput.value.trim();
+            const rawEnd = endInput.value.trim();
             const text = taskInput.value.trim();
 
-            console.log('addScheduleBlock - start:', start, 'end:', end, 'text:', text);
-
-            if (!start || !end || !text) {
+            if (!rawStart || !rawEnd || !text) {
                 showAlertModal('Missing Information', 'Please fill in start time, end time, and task description.');
                 return;
             }
+
+            const start = normalizeTime(rawStart);
+            let end = normalizeTime(rawEnd);
+            if (!start || !end) {
+                showAlertModal('Invalid Time', 'Enter times like 10:20.');
+                return;
+            }
+
+            // "12:00 to 01:00" means noon until 1pm
+            end = resolvePmEnd(start, end);
+            startInput.value = start;
+            endInput.value = end;
 
             if (start >= end) {
                 showAlertModal('Invalid Time Range', 'End time must be after start time.');
@@ -3721,7 +3745,11 @@
                 return;
             }
 
-            block[field] = normalized;
+            // Same 12-hour reading as the add form, so editing an end time to
+            // 01:00 after a midday start means 1pm rather than a backwards range
+            block[field] = field === 'end'
+                ? resolvePmEnd(block.start, normalized)
+                : normalized;
 
             saveSchedule();
             renderScheduleList();
