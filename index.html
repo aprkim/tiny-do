@@ -4273,19 +4273,34 @@
 
             scheduleAddBtn.addEventListener('click', addScheduleBlock);
 
-            // Auto-format time inputs (add colon automatically)
+            // Auto-format time inputs (add colon automatically).
+            // The cursor is recomputed from how many DIGITS precede it, not from
+            // its old index — an index-based adjustment left the cursor sitting
+            // before the auto-inserted colon, so typing 1,0,3,0 came out "10:03":
+            // the third digit landed in front of the colon and the fourth in
+            // front of the third.
             function formatTimeInput(input) {
                 input.addEventListener('input', (e) => {
-                    const cursorPos = e.target.selectionStart;
+                    // On deletion, don't re-insert the colon at exactly 2 digits,
+                    // otherwise backspacing "10:" restores it and it can never be removed
+                    const deleting = e.inputType && e.inputType.indexOf('delete') === 0;
                     const oldValue = e.target.value;
-                    let value = oldValue.replace(/[^0-9]/g, '');
-                    if (value.length >= 2) {
-                        value = value.slice(0, 2) + ':' + value.slice(2, 4);
+                    const digitsBeforeCursor = oldValue
+                        .slice(0, e.target.selectionStart)
+                        .replace(/[^0-9]/g, '').length;
+
+                    const digits = oldValue.replace(/[^0-9]/g, '').slice(0, 4);
+                    let value = digits;
+                    if (digits.length > 2 || (digits.length === 2 && !deleting)) {
+                        value = digits.slice(0, 2) + ':' + digits.slice(2);
                     }
+
                     if (value !== oldValue) {
                         e.target.value = value;
-                        // Adjust cursor: if we inserted a colon before the cursor, shift it forward
-                        const newPos = cursorPos <= 2 ? cursorPos : Math.min(cursorPos + (value.length - oldValue.length), value.length);
+                        // Land after the colon once two digits precede the cursor,
+                        // so the next keystroke goes into the minutes
+                        let newPos = digitsBeforeCursor < 2 ? digitsBeforeCursor : digitsBeforeCursor + 1;
+                        newPos = Math.min(newPos, value.length);
                         e.target.setSelectionRange(newPos, newPos);
                     }
                 });
