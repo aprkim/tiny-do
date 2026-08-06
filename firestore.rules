@@ -2,6 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── tinyWins (tiny-do and friends) ─────────────────────────────────────
     // Data is addressed by sync code, which acts as a shared key for
     // cross-device access. The code IS the secret, so the rules must make
     // sure codes cannot be discovered.
@@ -14,25 +15,41 @@ service cloud.firestore {
     //
     // `get` still allows the only access pattern the apps actually use,
     // collection('tinyWins').doc(syncCode), while collection-wide queries
-    // are now denied.
+    // are now denied. These apps sign in anonymously, so no email checks
+    // can apply here.
     match /tinyWins/{syncCode} {
       allow get, write: if request.auth != null;
     }
 
-    // Tiny Cards metadata (sender, recipient, occasion, date, page paths).
-    // The images themselves live in Cloud Storage under cards/{uid}/…; this
-    // document is what tells the archive which paths exist, because the
-    // Storage rules deny `list` outright.
+    // ── Tiny Cards ─────────────────────────────────────────────────────────
+    // One shared family space with an email allowlist: the owner can read
+    // and write, named viewers can only read. Everyone must have a verified
+    // email — an anonymous or unverified session gets nothing.
     //
-    // Keyed by the signed-in user's uid rather than a shared sync code, and
-    // the document id must match the caller, so one account cannot read
-    // another's card list.
+    // This replaced uid-keyed documents. Keying by uid made viewer access
+    // impossible: a viewer's uid points at their own (empty) document, not
+    // the owner's. The space id in the path is shared instead, and identity
+    // is judged by email, which is what the humans involved actually have.
     //
     // NOTE: Firestore rules are project-wide, so this file is the single
     // source of truth for tiny-wins25 and is deployed from the tiny-do repo.
-    // Deploying rules from another repo would overwrite these.
-    match /tinyCards/{uid} {
-      allow get, write: if request.auth != null && request.auth.uid == uid;
+    function cardsVerified() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function cardsOwner() {
+      return cardsVerified() && request.auth.token.email == 'aprkim@gmail.com';
+    }
+    function cardsViewer() {
+      // Read-only family members. Add their Google account emails here and
+      // to the matching list in tiny-cards/storage.rules.
+      return cardsVerified() && request.auth.token.email in [
+        'viewer-one-not-yet-set@invalid.example',
+        'viewer-two-not-yet-set@invalid.example'
+      ];
+    }
+    match /tinyCards/{space} {
+      allow get: if cardsOwner() || cardsViewer();
+      allow write: if cardsOwner();
     }
   }
 }
