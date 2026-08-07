@@ -40,16 +40,25 @@ service cloud.firestore {
       return cardsVerified() && request.auth.token.email == 'aprkim@gmail.com';
     }
     function cardsViewer() {
-      // Read-only family members. Add their Google account emails here and
-      // to the matching list in tiny-cards/storage.rules.
-      return cardsVerified() && request.auth.token.email in [
-        'viewer-one-not-yet-set@invalid.example',
-        'viewer-two-not-yet-set@invalid.example'
-      ];
+      // Access is granted by redeeming an invite: the redeemInvite Cloud Function
+      // sets this custom claim, and revokeViewer clears it. Per-account and
+      // revocable — this replaced the hardcoded email allowlist.
+      return cardsVerified() && request.auth.token.cardsViewer == true;
     }
     match /tinyCards/{space} {
       allow get: if cardsOwner() || cardsViewer();
       allow write: if cardsOwner();
+    }
+
+    // Invites and the viewer roster are written only by the invite Cloud
+    // Functions (the Admin SDK bypasses these rules). Clients get nothing here —
+    // except the owner may read the roster to revoke people.
+    match /invites/{code} {
+      allow read, write: if false;
+    }
+    match /cardViewers/{uid} {
+      allow read: if cardsOwner();
+      allow write: if false;
     }
   }
 }
