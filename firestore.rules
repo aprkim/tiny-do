@@ -3,45 +3,52 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ── tinyWins (tiny-do and friends) ─────────────────────────────────────
-    // Data is addressed by sync code, which acts as a shared key for
-    // cross-device access. The code IS the secret, so the rules must make
-    // sure codes cannot be discovered.
-    //
-    // Deliberately `get` and not `read`: in Firestore, `read` means
-    // `get` + `list`, and granting `list` here let any anonymous user run
-    // db.collection('tinyWins').get() and receive every document — with the
-    // sync codes as the document IDs. `get` still allows the only access
-    // pattern the apps use, collection('tinyWins').doc(syncCode).
+    // Data is addressed by sync code (a shared secret). `get` not `read` so the
+    // collection can't be enumerated to discover codes.
     match /tinyWins/{syncCode} {
       allow get, write: if request.auth != null;
     }
 
     // ── Tiny Cards ─────────────────────────────────────────────────────────
-    // Multi-tenant: each signed-in user owns their OWN archive at
-    // tinyCards/{uid}, keyed by their auth uid. A user can only touch the
-    // document whose id equals their uid, so no one can read or write another
-    // person's cards. Everyone must have a verified email.
+    // Multi-tenant: each signed-in user owns tinyCards/{uid}. A user can always
+    // read+write their own space. They can additionally READ another user's
+    // space if that owner's uid is in their `viewOf` custom claim (granted by
+    // redeeming an invite; see the Cloud Functions). Viewers are read-only —
+    // only the owner can write. Everyone must have a verified email.
     //
-    // This replaced the single shared "family" space + email allowlist.
-    // Cross-user sharing (invites/viewers) is deferred to a later phase.
-    //
-    // `get` not `read`: no `list`, so the collection can't be enumerated.
-    //
-    // NOTE: Firestore rules are project-wide, so this file is the single
-    // source of truth for tiny-wins25 and is deployed from the tiny-do repo.
+    // Firestore rules are project-wide; this file is the source of truth for
+    // tiny-wins25 and deploys from the tiny-do repo. Keep the viewOf check in
+    // step with tiny-cards/storage.rules.
     function cardsVerified() {
       return request.auth != null && request.auth.token.email_verified == true;
     }
+    function canView(uid) {
+      return request.auth.uid == uid
+        || (request.auth.token.viewOf != null && request.auth.token.viewOf.hasAny([uid]));
+    }
     match /tinyCards/{uid} {
-      allow get, write: if cardsVerified() && request.auth.uid == uid;
+      allow get:   if cardsVerified() && canView(uid);
+      allow write: if cardsVerified() && request.auth.uid == uid;   // owner only
     }
 
-    // Reserved for future cross-user sharing; clients get nothing for now.
+    // Invite codes are written only by the Cloud Functions (Admin SDK bypasses
+    // rules); clients never read or write them directly.
     match /invites/{code} {
       allow read, write: if false;
     }
-    match /cardViewers/{uid} {
-      allow read, write: if false;
+
+    // Rosters (written only by the invite functions):
+    //  • cardViewers/{ownerUid}/viewers/{viewerUid} — the owner's list of who can
+    //    view their space (owner reads it to manage/revoke).
+    //  • sharedWithMe/{viewerUid}/spaces/{ownerUid} — the viewer's list of spaces
+    //    shared with them, with a label (viewer reads it for the space switcher).
+    match /cardViewers/{ownerUid}/viewers/{viewerUid} {
+      allow read:  if request.auth != null && request.auth.uid == ownerUid;
+      allow write: if false;
+    }
+    match /sharedWithMe/{viewerUid}/spaces/{ownerUid} {
+      allow read:  if request.auth != null && request.auth.uid == viewerUid;
+      allow write: if false;
     }
   }
 }
