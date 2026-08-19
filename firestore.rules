@@ -12,8 +12,8 @@ service cloud.firestore {
     // ── Tiny Cards ─────────────────────────────────────────────────────────
     // Multi-tenant: each signed-in user owns tinyCards/{uid}. A user can always
     // read+write their own space. They can additionally READ another user's
-    // space if that owner's uid is in their `viewOf` custom claim (granted by
-    // redeeming an invite; see the Cloud Functions). Viewers are read-only —
+    // space if that owner's uid is in their `viewOf` custom claim (granted when an
+    // invited email signs in; see the Cloud Functions). Viewers are read-only —
     // only the owner can write. Everyone must have a verified email.
     //
     // Firestore rules are project-wide; this file is the source of truth for
@@ -31,24 +31,29 @@ service cloud.firestore {
       allow write: if cardsVerified() && request.auth.uid == uid;   // owner only
     }
 
-    // Invite codes are written only by the Cloud Functions (Admin SDK bypasses
-    // rules); clients never read or write them directly.
-    match /invites/{code} {
-      allow read, write: if false;
-    }
-
-    // Rosters (written only by the invite functions):
-    //  • cardViewers/{ownerUid}/viewers/{viewerUid} — the owner's list of who can
-    //    view their space (owner reads it to manage/revoke).
+    // Sharing-by-email records (written only by the invite/sync/revoke functions):
+    //  • viewerInvites/{ownerUid}/emails/{emailKey} — the owner's list of who they
+    //    shared with (email + invited/active status); owner reads it to manage.
     //  • sharedWithMe/{viewerUid}/spaces/{ownerUid} — the viewer's list of spaces
-    //    shared with them, with a label (viewer reads it for the space switcher).
-    match /cardViewers/{ownerUid}/viewers/{viewerUid} {
+    //    shared with them (viewer reads it for the space switcher).
+    //  • emailGrants/{emailKey}/owners/{ownerUid} — reverse index used to grant the
+    //    claim on sign-in; server-only, never client-readable.
+    match /viewerInvites/{ownerUid}/emails/{emailKey} {
       allow read:  if request.auth != null && request.auth.uid == ownerUid;
       allow write: if false;
     }
     match /sharedWithMe/{viewerUid}/spaces/{ownerUid} {
       allow read:  if request.auth != null && request.auth.uid == viewerUid;
       allow write: if false;
+    }
+    match /emailGrants/{emailKey}/owners/{ownerUid} {
+      allow read, write: if false;
+    }
+
+    // Transcription usage counter — written only by the transcribeCard function
+    // (Admin SDK bypasses rules). Clients never read or write it.
+    match /transcriptions/{uid} {
+      allow read, write: if false;
     }
   }
 }
