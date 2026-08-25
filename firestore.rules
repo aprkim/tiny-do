@@ -55,5 +55,22 @@ service cloud.firestore {
     match /transcriptions/{uid} {
       allow read, write: if false;
     }
+
+    // ── TinyRoom (room2.tinywins.space) usage log ───────────────────────────
+    // Written only by the livekitWebhook function (Admin SDK). The admin page
+    // reads it; nobody else can.
+    function tinyroomAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == 'aprkim@gmail.com';
+    }
+    match /tinyroomSessions/{sid} {
+      allow read:  if tinyroomAdmin();
+      allow write: if false;
+    }
+    match /tinyroomRooms/{sid} {
+      allow read:  if tinyroomAdmin();
+      allow write: if false;
+    }
   }
 }
