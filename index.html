@@ -2514,8 +2514,9 @@
             // Load focus notes
             loadFocusNotesFromStorage();
 
-            // Load later (someday) tasks
+            // Load later (someday) tasks, then file away anything checked off last time
             loadLaterFromStorage();
+            archiveCompletedLaterTasks();
         }
 
         // ==================== ONBOARDING ====================
@@ -3458,6 +3459,14 @@
             if (!task) return;
 
             task.completed = !task.completed;
+            if (task.completed) {
+                // Remembered so the sweep files it under the day it was actually done
+                task.completedAt = getTodayString();
+                task.completedMode = state.todayMode;
+            } else {
+                delete task.completedAt;
+                delete task.completedMode;
+            }
             saveLaterTasks();
             renderLaterList();
         }
@@ -3477,13 +3486,55 @@
 
             showConfirmModal(
                 'Clear Done',
-                `Remove ${doneCount} completed item${doneCount === 1 ? '' : 's'} from Later?`,
+                `Move ${doneCount} completed item${doneCount === 1 ? '' : 's'} to History?`,
                 () => {
-                    state.laterTasks = state.laterTasks.filter(t => !t.completed);
-                    saveLaterTasks();
+                    archiveCompletedLaterTasks();
                     renderLaterList();
                 }
             );
+        }
+
+        // Completed Later items don't linger: on the next visit (or after a
+        // sync brings in changes from another device) they leave Later and are
+        // filed in History under the day they were checked off. Each lands in
+        // that day's existing entry when there is one, otherwise a new entry is
+        // created — either way as a one-time task, like a task moved off Today.
+        function archiveCompletedLaterTasks() {
+            const done = (state.laterTasks || []).filter(t => t.completed);
+            if (done.length === 0) return false;
+
+            const today = getTodayString();
+            const byDate = {};
+            done.forEach(t => {
+                const date = t.completedAt || today;
+                (byDate[date] = byDate[date] || []).push({ text: t.text, completed: true, isTemplate: false, fromLater: true });
+            });
+
+            Object.keys(byDate).forEach(date => {
+                const tasks = byDate[date];
+                const existing = state.history.find(e => e.date === date);
+                if (existing) {
+                    existing.tasks = (existing.tasks || []).concat(tasks);
+                    return;
+                }
+                const entry = {
+                    date: date,
+                    mode: (done.find(t => (t.completedAt || today) === date) || {}).completedMode || state.todayMode,
+                    tasksCompleted: tasks.length,
+                    tasksTotal: tasks.length,
+                    percentage: 100,
+                    tasks: tasks
+                };
+                // History is newest-first; slot the entry by date
+                const at = state.history.findIndex(e => e.date < date);
+                if (at === -1) state.history.push(entry); else state.history.splice(at, 0, entry);
+            });
+            state.history = state.history.slice(0, 30);
+
+            state.laterTasks = state.laterTasks.filter(t => !t.completed);
+            saveHistory();
+            saveLaterTasks();
+            return true;
         }
 
         // Sweep a one-time task off Today and park it in Later.
@@ -5245,6 +5296,7 @@
             }
             if (remoteData.laterTasks) {
               window.state.laterTasks = remoteData.laterTasks;
+              if (window.archiveCompletedLaterTasks) window.archiveCompletedLaterTasks();
             }
 
             // Save to localStorage to keep it in sync
@@ -5375,7 +5427,10 @@
               if (remoteData.history) window.state.history = remoteData.history;
               if (remoteData.todayMode) window.state.todayMode = remoteData.todayMode;
               if (remoteData.scheduleByDate) window.state.scheduleByDate = remoteData.scheduleByDate;
-              if (remoteData.laterTasks) window.state.laterTasks = remoteData.laterTasks;
+              if (remoteData.laterTasks) {
+                window.state.laterTasks = remoteData.laterTasks;
+                if (window.archiveCompletedLaterTasks) window.archiveCompletedLaterTasks();
+              }
 
               // Save to localStorage
               localStorage.setItem(STORAGE_KEYS.TODAY_TASKS, JSON.stringify(window.state.todayTasks));
