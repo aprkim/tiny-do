@@ -2468,8 +2468,10 @@
         function loadState() {
             state.setupComplete = localStorage.getItem(STORAGE_KEYS.SETUP_COMPLETE) === 'true';
 
-            // Always start on Today tab on page load
-            state.activeTab = 'today';
+            // Come back to the tab you were on (a refresh on History stays on History)
+            const NAV_TABS = ['today', 'later', 'schedule', 'history', 'templates'];
+            const lastTab = localStorage.getItem(STORAGE_KEYS.LAST_TAB);
+            state.activeTab = NAV_TABS.includes(lastTab) ? lastTab : 'today';
             
             const savedTemplates = localStorage.getItem(STORAGE_KEYS.TEMPLATES);
             if (savedTemplates) {
@@ -2711,35 +2713,9 @@
                         important: t.important || false
                     }));
                 
-                // Save previous day to history
+                // Save previous day to history (final snapshot of that day)
                 if (state.todayTasks.length > 0) {
-                    const templateTasks = state.todayTasks.filter(t => t.isTemplate);
-                    const completed = templateTasks.filter(t => t.completed).length;
-                    const total = templateTasks.length;
-                    
-                    const dayEntry = {
-                        date: state.todayDate,
-                        mode: state.todayMode,
-                        tasksCompleted: completed,
-                        tasksTotal: total,
-                        percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
-                        tasks: state.todayTasks.map(t => ({
-                            text: t.text,
-                            completed: t.completed,
-                            isTemplate: t.isTemplate
-                        }))
-                    };
-                    // The Later sweep may already have filed items under this date —
-                    // fold the day's tasks into that entry rather than adding a second one.
-                    const existingDay = state.history.find(e => e.date === state.todayDate);
-                    if (existingDay) {
-                        const laterItems = (existingDay.tasks || []).filter(x => x.fromLater);
-                        Object.assign(existingDay, dayEntry, { tasks: dayEntry.tasks.concat(laterItems) });
-                    } else {
-                        state.history.unshift(dayEntry);
-                    }
-                    
-                    state.history = state.history.slice(0, 30);
+                    upsertDayHistory(state.todayDate);
                     saveHistory();
                 }
                 
@@ -3343,8 +3319,45 @@
         }
 
         // ==================== STORAGE ====================
+        // Write the day's routine snapshot into History under `date`, merging into
+        // an existing entry for that date (keeping any items filed there from Later)
+        // rather than adding a second entry for the same day. Used at day rollover
+        // and kept live for today, so History always shows today's progress.
+        function upsertDayHistory(date) {
+            const templateTasks = state.todayTasks.filter(t => t.isTemplate);
+            const completed = templateTasks.filter(t => t.completed).length;
+            const total = templateTasks.length;
+            const dayEntry = {
+                date: date,
+                mode: state.todayMode,
+                tasksCompleted: completed,
+                tasksTotal: total,
+                percentage: total > 0 ? Math.round((completed / total) * 100) : 0,
+                tasks: state.todayTasks.map(t => ({
+                    text: t.text,
+                    completed: t.completed,
+                    isTemplate: t.isTemplate
+                }))
+            };
+            const existing = state.history.find(e => e.date === date);
+            if (existing) {
+                const laterItems = (existing.tasks || []).filter(x => x.fromLater);
+                Object.assign(existing, dayEntry, { tasks: dayEntry.tasks.concat(laterItems) });
+            } else {
+                const at = state.history.findIndex(e => e.date < date);   // newest-first
+                if (at === -1) state.history.push(dayEntry); else state.history.splice(at, 0, dayEntry);
+            }
+            state.history = state.history.slice(0, 30);
+        }
+
         function saveTodayTasks() {
             localStorage.setItem(STORAGE_KEYS.TODAY_TASKS, JSON.stringify(state.todayTasks));
+            // Keep today's History card current (completed items show up right away)
+            if (state.todayDate && state.todayTasks.length > 0) {
+                upsertDayHistory(state.todayDate);
+                localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(state.history));
+                if (state.activeTab === 'history') renderHistoryList();
+            }
             // Trigger Firebase sync if available
             if (window.syncToFirebase) {
                 window.syncToFirebase();
