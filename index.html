@@ -2717,7 +2717,7 @@
                     const completed = templateTasks.filter(t => t.completed).length;
                     const total = templateTasks.length;
                     
-                    state.history.unshift({
+                    const dayEntry = {
                         date: state.todayDate,
                         mode: state.todayMode,
                         tasksCompleted: completed,
@@ -2728,7 +2728,16 @@
                             completed: t.completed,
                             isTemplate: t.isTemplate
                         }))
-                    });
+                    };
+                    // The Later sweep may already have filed items under this date —
+                    // fold the day's tasks into that entry rather than adding a second one.
+                    const existingDay = state.history.find(e => e.date === state.todayDate);
+                    if (existingDay) {
+                        const laterItems = (existingDay.tasks || []).filter(x => x.fromLater);
+                        Object.assign(existingDay, dayEntry, { tasks: dayEntry.tasks.concat(laterItems) });
+                    } else {
+                        state.history.unshift(dayEntry);
+                    }
                     
                     state.history = state.history.slice(0, 30);
                     saveHistory();
@@ -3226,8 +3235,10 @@
                         </svg>
                     </div>
                             <div class="history-stats">
-                        <span class="history-completion">${entry.tasksCompleted} / ${entry.tasksTotal} completed</span>
-                        <span class="history-percentage">${entry.percentage}%</span>
+                        ${entry.tasksTotal > 0
+                            ? `<span class="history-completion">${entry.tasksCompleted} / ${entry.tasksTotal} completed</span>
+                        <span class="history-percentage">${entry.percentage}%</span>`
+                            : `<span class="history-completion">${(entry.tasks || []).filter(x => x.fromLater).length || 0} from Later</span>`}
                             </div>
                     <div class="history-tasks-list" style="display: ${isExpanded ? 'block' : 'none'}">
                         ${tasksHtml}
@@ -3517,12 +3528,15 @@
                     existing.tasks = (existing.tasks || []).concat(tasks);
                     return;
                 }
+                // Later items are extras: they never count toward the day's routine
+                // stats (tasksCompleted / tasksTotal / percentage stay at 0 until the
+                // day rolls over and fills them in).
                 const entry = {
                     date: date,
                     mode: (done.find(t => (t.completedAt || today) === date) || {}).completedMode || state.todayMode,
-                    tasksCompleted: tasks.length,
-                    tasksTotal: tasks.length,
-                    percentage: 100,
+                    tasksCompleted: 0,
+                    tasksTotal: 0,
+                    percentage: 0,
                     tasks: tasks
                 };
                 // History is newest-first; slot the entry by date
