@@ -26,15 +26,39 @@ service cloud.firestore {
       return request.auth.uid == uid
         || (request.auth.token.viewOf != null && request.auth.token.viewOf.hasAny([uid]));
     }
-    /* The 20-card limit and its Kept Unlimited exemption are written and tested,
-       and deliberately NOT live: the version on the App Store is 1.0.1, which has
-       no paywall and no way to explain a refused save. Enforcing it now would
-       show someone "Could not reach your cards", lose the card they just scanned,
-       and leave its photos orphaned in Storage. Restore the limit — see the
-       commit that removed it — on the day 1.0.2 is released, not before. */
+    // Free archives hold 20 cards; Kept Unlimited lifts the ceiling. The limit
+    // lives here because the client writes the whole cards array itself — there
+    // is no function in between to count them, and a check in the app would be
+    // a suggestion rather than a limit.
+    //
+    // Only GROWING the archive is restricted. Someone already past 20 — an
+    // early user, or a subscriber who let it lapse — keeps full use of what they
+    // have: renaming, deleting, editing a transcript and exporting all still
+    // work. Losing access to your own keepsakes because you stopped paying
+    // would be indefensible.
+    function cardCount(d) {
+      return d.get('cards', []).size();
+    }
+    // isUnlimited is the live subscription; unlimitedGrant is permanent — the
+    // people who used Kept before the limit existed, and comped accounts — and
+    // survives a lapse, so the store can never take it back. Either counts.
+    function plan(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data;
+    }
+    function cardsUnlimited(uid) {
+      return exists(/databases/$(database)/documents/users/$(uid))
+        && (plan(uid).get('isUnlimited', false) == true
+            || plan(uid).get('unlimitedGrant', false) == true);
+    }
     match /tinyCards/{uid} {
-      allow get:   if cardsVerified() && canView(uid);
-      allow write: if cardsVerified() && request.auth.uid == uid;   // owner only
+      allow get:    if cardsVerified() && canView(uid);
+      allow create: if cardsVerified() && request.auth.uid == uid
+                    && (cardCount(request.resource.data) <= 20 || cardsUnlimited(uid));
+      allow update: if cardsVerified() && request.auth.uid == uid
+                    && (cardCount(request.resource.data) <= 20
+                        || cardCount(request.resource.data) <= cardCount(resource.data)
+                        || cardsUnlimited(uid));
+      allow delete: if cardsVerified() && request.auth.uid == uid;
     }
 
     // Sharing-by-email records (written only by the invite/sync/revoke functions):
